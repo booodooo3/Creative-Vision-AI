@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<!-- lang and dir will be set by JavaScript -->
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Vision AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jsPDF and JSZip for PDF/ZIP creation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Fonts for both languages -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Default font will be set by JS */
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        .tab-active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #1e293b;
+        }
+        .pulsing-loader {
+            border: 4px solid #3b82f6;
+            border-right-color: transparent;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #error-message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+        }
+        #edit-image-preview-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #334155;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: rotate(-2.5deg); /* Angled preview */
+        }
+        #edit-image-preview-container:hover {
+            transform: rotate(0deg); /* Straighten on hover */
+        }
+        #edit-image-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .result-text-container {
+            white-space: pre-wrap; /* Allows text to wrap and respects newlines */
+            text-align: right;
+            direction: rtl;
+        }
+        html[lang="en"] .result-text-container {
+            text-align: left;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+        <!-- Header -->
+        <header class="text-center relative">
+             <button id="lang-switcher" class="absolute top-0 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm">
+                English
+            </button>
+            <h1 data-key="mainTitle" class="text-3xl md:text-4xl font-bold text-white">Creative Vision AI</h1>
+            <p data-key="subtitle" class="text-gray-400 mt-2">اكتب، وأنشئ الصور بقوة الذكاء الاصطناعي.</p>
+        </header>
+
+        <!-- Error Message Box -->
+        <div id="error-message-box" class="p-4 mb-4 text-sm text-red-300 bg-red-900/50 rounded-lg border border-red-800/50 flex items-center gap-3" role="alert">
+            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+            <div>
+                <span id="error-title" class="font-bold" data-key="errorTitleDefault"></span> 
+                <span id="error-text"></span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="border-b border-slate-700">
+            <nav class="-mb-px flex space-x-4 rtl:space-x-reverse overflow-x-auto pb-px" aria-label="Tabs">
+                <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
+                <button id="tab-article" data-key="tabArticle" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">كاتب المقالات</button>
+                <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tab-content-text" class="tab-content">
+            <textarea id="text-prompt" data-key-placeholder="textPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي..."></textarea>
+            <button id="generate-btn-text" data-key="generateBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">إنشاء صورة</button>
+        </div>
+
+        <div id="tab-content-article" class="tab-content hidden space-y-4">
+             <input type="text" id="article-title" data-key-placeholder="articleTitlePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="اكتب عنوان المقال هنا...">
+            <button id="generate-btn-article" data-key="writeArticleBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">اكتب المقال</button>
+        </div>
+
+        <div id="tab-content-aiedit" class="tab-content hidden space-y-4">
+             <label for="edit-image-upload" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
+                <span data-key="uploadForEditing"></span>
+            </label>
+            <input id="edit-image-upload" type="file" class="hidden" accept="image/*" />
+            
+            <div id="edit-image-preview-container">
+                 <div id="edit-image-placeholder" class="text-center text-slate-400 p-4">
+                    <svg class="w-16 h-16 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <p class="mt-2 font-semibold" data-key="imagePreviewPlaceholder">معاينة الصورة</p>
+                 </div>
+                 <img id="edit-image-preview" src="#" alt="Image preview for editing" class="hidden">
+            </div>
+
+            <textarea id="edit-prompt" data-key-placeholder="editPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-600" placeholder="مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة..." disabled></textarea>
+            <button id="generate-btn-aiedit" data-key="editBtn" class="generate-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>تطبيق التعديلات</button>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="bg-slate-900 rounded-lg p-4 min-h-[300px] flex flex-col items-center justify-center space-y-4 hidden">
+            <!-- Loader -->
+            <div id="loader" class="text-center">
+                <div class="pulsing-loader mx-auto"></div>
+                <p data-key="loaderText" class="mt-4 text-gray-400"></p>
+            </div>
+            <!-- Image Result -->
+            <div id="image-result-container" class="w-full max-w-lg hidden relative">
+                <img id="generated-image" class="w-full rounded-lg" alt="">
+            </div>
+            <!-- Article Result -->
+            <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden">
+                <div id="article-content" class="result-text-container"></div>
+            </div>
+            <!-- Payment & Download -->
+            <div id="payment-section" class="text-center hidden w-full max-w-md space-y-3">
+                 <div id="payment-message" class="hidden p-3 text-sm text-green-400 bg-green-800/50 rounded-lg" role="alert">
+                    <span data-key="paymentSuccess" class="font-medium"></span>
+                </div>
+                <button id="pay-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                </button>
+                 <p id="payment-instruction" data-key="paymentInstructionText" class="text-xs text-gray-400 hidden"></p>
+                <a id="download-btn" href="#" download="ai_generated_content.zip" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center inline-block">
+                    <span></span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const { jsPDF } = window.jspdf;
+            const JSZip = window.JSZip;
+
+            // --- I18N (Internationalization) ---
+            const translations = {
+                en: {
+                    mainTitle: 'Creative Vision AI',
+                    subtitle: 'Write articles and create images with the power of AI.',
+                    tabText: 'Text to Image',
+                    tabArticle: 'AI Article Writer',
+                    tabAiEdit: 'AI Image Editing',
+                    textPlaceholder: 'Example: An astronaut riding a horse on Mars, cinematic style...',
+                    generateBtn: 'Generate Image',
+                    articleTitlePlaceholder: 'Enter the article title here...',
+                    writeArticleBtn: 'Write Article',
+                    uploadForEditing: 'Upload an Image to Start Editing',
+                    editPlaceholder: 'e.g., change hair color to blonde, add a hat...',
+                    editBtn: 'Apply Edits',
+                    imagePreviewPlaceholder: 'Image Preview',
+                    loaderText: 'The AI is creating your content... This might take a moment.',
+                    generatedImageAlt: 'AI Generated Image',
+                    paymentSuccess: 'Payment successful! You can now download your file.',
+                    payBtnText: 'Pay $1.00 to Download',
+                    payBtnConfirm: 'Click to Confirm Payment & Unlock',
+                    paymentInstructionText: 'After paying in the new window, click the button above to unlock the download link.',
+                    downloadBtnImage: 'Download Image',
+                    downloadBtnZip: 'Download ZIP File',
+                    errorTitleDefault: 'Operation Failed!',
+                    errorInputTitle: 'Input Error',
+                    errorInputText: 'Please enter a text prompt to generate the image.',
+                    errorInputArticle: 'Please enter a title for the article.',
+                    errorInputEdit: 'Please upload an image and provide an edit instruction.',
+                    errorPaymentTitle: 'Payment Required',
+                    errorPaymentText: 'Please complete the payment process to enable the download link.',
+                    errorApiLimit: 'You have reached the request limit. Please try again later.',
+                    errorApiGeneric: 'An error occurred: {message}',
+                    errorNoImage: 'Valid image data was not received from the API.',
+                    errorNoText: 'Valid text was not received from the API. The response may have been blocked.',
+                },
+                ar: {
+                    mainTitle: 'Creative Vision AI',
+                    subtitle: 'اكتب، وأنشئ الصور بقوة الذكاء الاصطناعي.',
+                    tabText: 'نص إلى صورة',
+                    tabArticle: 'كاتب المقالات',
+                    tabAiEdit: 'تعديل الصور',
+                    textPlaceholder: 'مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي...',
+                    generateBtn: 'إنشاء صورة',
+                    articleTitlePlaceholder: 'اكتب عنوان المقال هنا...',
+                    writeArticleBtn: 'اكتب المقال',
+                    uploadForEditing: 'ارفع صورة لبدء التعديل',
+                    editPlaceholder: 'مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة...',
+                    editBtn: 'تطبيق التعديلات',
+                    imagePreviewPlaceholder: 'معاينة الصورة',
+                    loaderText: 'الذكاء الاصطناعي يقوم بإنشاء المحتوى الخاص بك... قد يستغرق هذا بعض الوقت.',
+                    generatedImageAlt: 'صورة من إنشاء الذكاء الاصطناعي',
+                    paymentSuccess: 'تم الدفع بنجاح! يمكنك الآن تنزيل ملفك.',
+                    payBtnText: 'ادفع 1.00 دولار للتنزيل',
+                    payBtnConfirm: 'انقر لتأكيد الدفع وفتح الرابط',
+                    paymentInstructionText: 'بعد الدفع في النافذة الجديدة، انقر على الزر أعلاه لفتح رابط التنزيل.',
+                    downloadBtnImage: 'تنزيل الصورة',
+                    downloadBtnZip: 'تنزيل ملف ZIP',
+                    errorTitleDefault: 'فشلت العملية!',
+                    errorInputTitle: 'خطأ في الإدخال',
+                    errorInputText: 'الرجاء إدخال وصف نصي لإنشاء الصورة.',
+                    errorInputArticle: 'الرجاء إدخال عنوان للمقال.',
+                    errorInputEdit: 'الرجاء رفع صورة وتقديم تعليمات التعديل.',
+                    errorPaymentTitle: 'الدفع مطلوب',
+                    errorPaymentText: 'يرجى إتمام عملية الدفع لتفعيل رابط التنزيل.',
+                    errorApiLimit: 'لقد وصلت إلى حد الطلبات. يرجى المحاولة مرة أخرى لاحقًا.',
+                    errorApiGeneric: 'حدث خطأ: {message}',
+                    errorNoImage: 'لم يتم استلام بيانات صورة صالحة من الواجهة البرمجية.',
+                    errorNoText: 'لم يتم استلام نص صالح من الواجهة البرمجية. قد يكون الرد محجوباً.',
+                }
+            };
+
+            let currentLang = localStorage.getItem('language') || 'ar';
+            let currentDownloadData = { type: null, content: null, title: 'content' };
+            const langSwitcher = document.getElementById('lang-switcher');
+            
+            const setLanguage = (lang) => {
+                currentLang = lang;
+                localStorage.setItem('language', lang);
+                
+                const translation = translations[lang];
+                document.documentElement.lang = lang;
+                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                document.body.style.fontFamily = lang === 'ar' ? "'Tajawal', sans-serif" : "'Inter', sans-serif";
+
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    if (translation[key]) {
+                        element.textContent = translation[key];
+                    }
+                });
+
+                document.querySelectorAll('[data-key-placeholder]').forEach(element => {
+                    const key = element.getAttribute('data-key-placeholder');
+                    if (translation[key]) {
+                        element.placeholder = translation[key];
+                    }
+                });
+                
+                document.getElementById('generated-image').alt = translation.generatedImageAlt;
+                langSwitcher.textContent = lang === 'ar' ? 'English' : 'العربية';
+                if(lang === 'ar') {
+                    langSwitcher.classList.remove('left-0');
+                    langSwitcher.classList.add('right-0');
+                } else {
+                    langSwitcher.classList.remove('right-0');
+                    langSwitcher.classList.add('left-0');
+                }
+                resetPaymentUI();
+            };
+
+            langSwitcher.addEventListener('click', () => {
+                const newLang = currentLang === 'ar' ? 'en' : 'ar';
+                setLanguage(newLang);
+            });
+            
+            // --- Element Selection ---
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            const textPrompt = document.getElementById('text-prompt');
+            const generateBtnText = document.getElementById('generate-btn-text');
+            const articleTitle = document.getElementById('article-title');
+            const generateBtnArticle = document.getElementById('generate-btn-article');
+
+            const resultSection = document.getElementById('result-section');
+            const loader = document.getElementById('loader');
+            const imageResultContainer = document.getElementById('image-result-container');
+            const textResultContainer = document.getElementById('text-result-container');
+            const articleContent = document.getElementById('article-content');
+            const generatedImage = document.getElementById('generated-image');
+
+            const paymentSection = document.getElementById('payment-section');
+            const payBtn = document.getElementById('pay-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const paymentMessage = document.getElementById('payment-message');
+            const paymentInstruction = document.getElementById('payment-instruction');
+            
+            const errorBox = document.getElementById('error-message-box');
+            const errorText = document.getElementById('error-text');
+            const errorTitle = document.getElementById('error-title');
+            
+            // AI Edit elements
+            const editImageUpload = document.getElementById('edit-image-upload');
+            const editImagePreviewContainer = document.getElementById('edit-image-preview-container');
+            const editImagePlaceholder = document.getElementById('edit-image-placeholder');
+            const editImagePreview = document.getElementById('edit-image-preview');
+            const editPrompt = document.getElementById('edit-prompt');
+            const generateBtnAiEdit = document.getElementById('generate-btn-aiedit');
+            let uploadedEditFile = null;
+
+            let paymentStep = 'initial';
+
+            // --- Prevent Default Image Actions ---
+            generatedImage.addEventListener('dblclick', (e) => e.preventDefault());
+            generatedImage.addEventListener('contextmenu', (e) => e.preventDefault());
+            
+            // --- Tab Switching Logic ---
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('tab-active'));
+                    tab.classList.add('tab-active');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    const contentId = `tab-content-${tab.id.split('-')[1]}`;
+                    document.getElementById(contentId).classList.remove('hidden');
+                });
+            });
+
+            // --- UI Helper Functions ---
+            const showLoader = (isLoading) => {
+                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit];
+                if (isLoading) {
+                    resultSection.classList.remove('hidden');
+                    loader.classList.remove('hidden');
+                    imageResultContainer.classList.add('hidden');
+                    textResultContainer.classList.add('hidden');
+                    paymentSection.classList.add('hidden');
+                    allGenerateBtns.forEach(btn => btn.disabled = true);
+                } else {
+                    loader.classList.add('hidden');
+                    allGenerateBtns.forEach(btn => btn.disabled = false);
+                }
+            };
+            
+            const showError = (titleKey, messageKey, replacements = {}) => {
+                const translation = translations[currentLang];
+                errorTitle.textContent = translation[titleKey] || translation['errorTitleDefault'];
+                let message = translation[messageKey] || messageKey;
+                for (const key in replacements) {
+                    message = message.replace(`{${key}}`, replacements[key]);
+                }
+                errorText.textContent = message;
+                errorBox.style.display = 'flex';
+                setTimeout(() => { errorBox.style.display = 'none'; }, 6000);
+            };
+
+            const resetPaymentUI = () => {
+                const translation = translations[currentLang];
+                paymentStep = 'initial';
+                const downloadBtnSpan = downloadBtn.querySelector('span');
+                
+                payBtn.textContent = translation.payBtnText;
+                
+                if (currentDownloadData.type === 'article') {
+                    if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnZip;
+                } else {
+                    if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnImage;
+                }
+                payBtn.classList.remove('hidden');
+                paymentInstruction.classList.add('hidden');
+                downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                paymentMessage.classList.add('hidden');
+            };
+
+            const showPaymentUI = (type) => {
+                paymentSection.classList.remove('hidden');
+                payBtn.classList.remove('hidden');
+                downloadBtn.classList.remove('hidden');
+                
+                if (type === 'article') {
+                    downloadBtn.download = 'ai_article.zip';
+                } else {
+                    downloadBtn.download = 'ai_generated_image.png';
+                }
+                resetPaymentUI();
+            };
+            
+            const fileToBase64 = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+
+            // --- Real AI Image Generation (Text-to-Image) ---
+            const generateAIImage = async (prompt) => {
+                if (!prompt.trim()) return showError("errorInputTitle", "errorInputText");
+                showLoader(true);
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+                const payload = { instances: [{ prompt }], parameters: { "sampleCount": 1 } };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+                    
+                    if (result.predictions && result.predictions[0]?.bytesBase64Encoded) {
+                        const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                        currentDownloadData = { type: 'image', content: imageUrl, title: prompt.substring(0, 20) };
+                        generatedImage.src = imageUrl;
+                        textResultContainer.classList.add('hidden');
+                        imageResultContainer.classList.remove('hidden');
+                        showPaymentUI('image');
+                    } else {
+                        console.error("API Response without image:", result);
+                        throw new Error("The AI could not generate an image for this prompt. It might be due to safety filters. Please try a different prompt.");
+                    }
+                } catch (error) {
+                    console.error("AI Generation Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+
+            generateBtnText.addEventListener('click', () => generateAIImage(textPrompt.value));
+
+            // --- Real AI Article Generation ---
+            const generateAIArticle = async (title) => {
+                if (!title.trim()) return showError("errorInputTitle", "errorInputArticle");
+                showLoader(true);
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a professional article writer. Write a comprehensive article about the given title. The article should be well-structured with an introduction, body, and conclusion. Use clear and informative language.";
+                const payload = { contents: [{ parts: [{ text: `Write an article about: "${title}"` }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+                    
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        currentDownloadData = { type: 'article', content: text, title };
+                        articleContent.textContent = text;
+                        imageResultContainer.classList.add('hidden');
+                        textResultContainer.classList.remove('hidden');
+                        showPaymentUI('article');
+                    } else {
+                        throw new Error(translations[currentLang].errorNoText);
+                    }
+                } catch (error) {
+                    console.error("AI Article Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            generateBtnArticle.addEventListener('click', () => generateAIArticle(articleTitle.value));
+
+            // --- Real AI Image Editing (Image-to-Image) ---
+            const editAIImage = async (file, prompt) => {
+                 if (!file || !prompt.trim()) return showError("errorInputTitle", "errorInputEdit");
+                showLoader(true);
+
+                try {
+                    const base64Data = await fileToBase64(file);
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                    const payload = { contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: file.type, data: base64Data } }] }], generationConfig: { responseModalities: ['IMAGE'] } };
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+                    
+                    const candidate = result.candidates?.[0];
+                    if (!candidate) {
+                        console.error("API returned no response candidate:", result);
+                        throw new Error("The AI did not return a valid response.");
+                    }
+                    
+                    const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
+
+                    if (blockReason) {
+                        const reasonText = result?.promptFeedback?.blockReason || 'Safety Filters';
+                        throw new Error(`Request blocked due to: ${reasonText}. Please adjust your prompt.`);
+                    }
+
+                    const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
+                    if (generatedPart && generatedPart.inlineData.data) {
+                        const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
+                        currentDownloadData = { type: 'image', content: imageUrl, title: 'edited-image' };
+                        generatedImage.src = imageUrl;
+                        textResultContainer.classList.add('hidden');
+                        imageResultContainer.classList.remove('hidden');
+                        showPaymentUI('image');
+                    } else {
+                         console.error("API Response without image:", result);
+                         let detailedError = "The AI could not edit the image. ";
+                         if (candidate.finishReason && candidate.finishReason !== 'STOP') {
+                            detailedError += `(Reason: ${candidate.finishReason}). `;
+                         }
+                         if (candidate.content?.parts?.[0]?.text) {
+                            detailedError += "The model returned text instead of an image. This can happen with restrictive safety filters. Please try different instructions.";
+                         } else {
+                            detailedError += "The response did not contain image data. This might be due to safety filters. Please try different instructions.";
+                         }
+                         throw new Error(detailedError);
+                    }
+                } catch (error) {
+                    console.error("AI Edit Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            generateBtnAiEdit.addEventListener('click', () => editAIImage(uploadedEditFile, editPrompt.value));
+
+            // --- Payment Logic ---
+            payBtn.addEventListener('click', () => {
+                const translation = translations[currentLang];
+                if (paymentStep === 'initial') {
+                    window.open('https://common-celestia-5y.zipwp.xyz/buy/creative-vision-ai-1', '_blank');
+                    payBtn.textContent = translation.payBtnConfirm;
+                    paymentInstruction.classList.remove('hidden');
+                    paymentStep = 'confirm';
+                } else if (paymentStep === 'confirm') {
+                    paymentMessage.classList.remove('hidden');
+                    payBtn.classList.add('hidden');
+                    paymentInstruction.classList.add('hidden');
+                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+            
+             // --- Download Logic ---
+            const downloadArticleAsZip = async (title, content) => {
+                const doc = new jsPDF();
+                const zip = new JSZip();
+
+                 doc.setLanguage('ar');
+                 doc.setFont('Helvetica', 'normal');
+                 const lines = doc.splitTextToSize(content, 180);
+
+                 const pageHeight = doc.internal.pageSize.height;
+                 let y = 15;
+                 for(let i = 0; i < lines.length; i++) {
+                    if (y > pageHeight - 15) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.text(lines[i], doc.internal.pageSize.width - 15, y, { align: 'right' });
+                    y += 7;
+                 }
+
+                const pdfBlob = doc.output('blob');
+                zip.file(`${title.replace(/ /g, "_")}.pdf`, pdfBlob);
+                
+                const zipBlob = await zip.generateAsync({ type: "blob" });
+                const url = URL.createObjectURL(zipBlob);
+                downloadBtn.href = url;
+                downloadBtn.click();
+                URL.revokeObjectURL(url);
+            };
+
+
+            downloadBtn.addEventListener('click', (event) => {
+                if (downloadBtn.classList.contains('cursor-not-allowed')) {
+                    event.preventDefault();
+                    showError("errorPaymentTitle", "errorPaymentText");
+                    return;
+                }
+                
+                if (currentDownloadData.type === 'article') {
+                    event.preventDefault(); // Prevent default link behavior
+                    downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
+                } else {
+                    downloadBtn.href = currentDownloadData.content;
+                }
+            });
+
+            // --- Image Upload Logic (for AI Edit tab) ---
+            editImageUpload.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    uploadedEditFile = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        editImagePlaceholder.classList.add('hidden');
+                        editImagePreview.src = event.target.result;
+                        editImagePreview.classList.remove('hidden');
+                        editPrompt.disabled = false;
+                        generateBtnAiEdit.disabled = false;
+                    };
+                    reader.readAsDataURL(uploadedEditFile);
+                } else {
+                    uploadedEditFile = null;
+                    editImagePreview.src = '#';
+                    editImagePreview.classList.add('hidden');
+                    editImagePlaceholder.classList.remove('hidden');
+                    editPrompt.disabled = true;
+                    generateBtnAiEdit.disabled = true;
+                }
+            });
+
+            // --- Initial Load ---
+            setLanguage(currentLang);
+        });
+    </script>
+
+</body>
+</html>
+
