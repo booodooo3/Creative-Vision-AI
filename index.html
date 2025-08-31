@@ -77,16 +77,28 @@
             text-align: left;
             direction: ltr;
         }
+        /* Added to prevent text selection in article box */
+        #text-result-container {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .lang-active {
+            background-color: #3b82f6;
+            color: white;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-gray-200 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-900 text-gray-200 flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
         <!-- Header -->
         <header class="text-center relative">
-             <button id="lang-switcher" class="absolute top-0 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm">
-                English
-            </button>
+            <div id="lang-switcher-container" class="absolute top-4 flex space-x-2 rtl:space-x-reverse">
+                <button id="lang-btn-en" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">E</button>
+                <button id="lang-btn-ar" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">A</button>
+            </div>
             <h1 data-key="mainTitle" class="text-3xl md:text-4xl font-bold text-white">Creative Vision AI</h1>
             <p data-key="subtitle" class="text-gray-400 mt-2">اكتب، وأنشئ الصور بقوة الذكاء الاصطناعي.</p>
         </header>
@@ -132,6 +144,7 @@
                     <p class="mt-2 font-semibold" data-key="imagePreviewPlaceholder">معاينة الصورة</p>
                  </div>
                  <img id="edit-image-preview" src="#" alt="Image preview for editing" class="hidden">
+                 <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
 
             <textarea id="edit-prompt" data-key-placeholder="editPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-600" placeholder="مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة..." disabled></textarea>
@@ -148,6 +161,7 @@
             <!-- Image Result -->
             <div id="image-result-container" class="w-full max-w-lg hidden relative">
                 <img id="generated-image" class="w-full rounded-lg" alt="">
+                <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
             <!-- Article Result -->
             <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden">
@@ -166,8 +180,16 @@
                 </a>
             </div>
         </div>
-
     </div>
+
+    <footer class="text-center py-4">
+        <p data-key="copyright" class="text-xs text-slate-500"></p>
+        <div class="mt-2">
+            <a href="https://www.instagram.com/boood0003" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">
+                https://www.instagram.com/boood0003
+            </a>
+        </div>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -214,6 +236,7 @@
                     errorNoImage: 'Valid image data was not received from the API.',
                     errorNoText: 'Valid text was not received from the API. The response may have been blocked.',
                     errorApiKey: 'API Key is missing or invalid. Please check your key in the script.',
+                    copyright: `Copyright © ${new Date().getFullYear()} Creative Vision AI. All Rights Reserved.`,
                 },
                 ar: {
                     mainTitle: 'Creative Vision AI',
@@ -249,13 +272,17 @@
                     errorNoImage: 'لم يتم استلام بيانات صورة صالحة من الواجهة البرمجية.',
                     errorNoText: 'لم يتم استلام نص صالح من الواجهة البرمجية. قد يكون الرد محجوباً.',
                     errorApiKey: 'مفتاح API مفقود أو غير صالح. الرجاء التحقق من المفتاح في الشيفرة البرمجية.',
+                    copyright: `حقوق الطبع والنشر © ${new Date().getFullYear()} Creative Vision AI. جميع الحقوق محفوظة.`,
                 }
             };
 
             let currentLang = localStorage.getItem('language') || 'ar';
             let currentDownloadData = { type: null, content: null, title: 'content' };
-            const langSwitcher = document.getElementById('lang-switcher');
             
+            const langSwitcherContainer = document.getElementById('lang-switcher-container');
+            const langBtnEn = document.getElementById('lang-btn-en');
+            const langBtnAr = document.getElementById('lang-btn-ar');
+
             const setLanguage = (lang) => {
                 currentLang = lang;
                 localStorage.setItem('language', lang);
@@ -280,21 +307,22 @@
                 });
                 
                 document.getElementById('generated-image').alt = translation.generatedImageAlt;
-                langSwitcher.textContent = lang === 'ar' ? 'English' : 'العربية';
+
+                langBtnEn.classList.toggle('lang-active', lang === 'en');
+                langBtnAr.classList.toggle('lang-active', lang === 'ar');
+
                 if(lang === 'ar') {
-                    langSwitcher.classList.remove('left-0');
-                    langSwitcher.classList.add('right-0');
+                    langSwitcherContainer.classList.remove('left-4');
+                    langSwitcherContainer.classList.add('right-4');
                 } else {
-                    langSwitcher.classList.remove('right-0');
-                    langSwitcher.classList.add('left-0');
+                    langSwitcherContainer.classList.remove('right-4');
+                    langSwitcherContainer.classList.add('left-4');
                 }
                 resetPaymentUI();
             };
 
-            langSwitcher.addEventListener('click', () => {
-                const newLang = currentLang === 'ar' ? 'en' : 'ar';
-                setLanguage(newLang);
-            });
+            langBtnEn.addEventListener('click', () => setLanguage('en'));
+            langBtnAr.addEventListener('click', () => setLanguage('ar'));
             
             // --- Element Selection ---
             const tabs = document.querySelectorAll('.tab-btn');
@@ -330,6 +358,12 @@
             const editPrompt = document.getElementById('edit-prompt');
             const generateBtnAiEdit = document.getElementById('generate-btn-aiedit');
             let uploadedEditFile = null;
+            
+            // --- Prevent Default Content Actions ---
+            imageResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            editImagePreviewContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            textResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+
 
             let paymentStep = 'initial';
             
@@ -340,21 +374,33 @@
                 }
                 return true;
             };
-
-            // --- Prevent Default Image Actions ---
-            generatedImage.addEventListener('dblclick', (e) => e.preventDefault());
-            generatedImage.addEventListener('contextmenu', (e) => e.preventDefault());
             
-            // --- Tab Switching Logic ---
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('tab-active'));
-                    tab.classList.add('tab-active');
-                    tabContents.forEach(content => content.classList.add('hidden'));
-                    const contentId = `tab-content-${tab.id.split('-')[1]}`;
-                    document.getElementById(contentId).classList.remove('hidden');
+            // --- Tab Switching Logic (FIXED) ---
+            tabs.forEach(clickedTab => {
+                clickedTab.addEventListener('click', () => {
+                    // Update tab appearance
+                    tabs.forEach(tab => {
+                        const isClicked = tab === clickedTab;
+                        
+                        // Toggle active state class
+                        tab.classList.toggle('tab-active', isClicked);
+                        
+                        // Toggle inactive state classes
+                        tab.classList.toggle('border-transparent', !isClicked);
+                        tab.classList.toggle('text-gray-400', !isClicked);
+                        tab.classList.toggle('hover:text-gray-200', !isClicked);
+                        tab.classList.toggle('hover:border-gray-500', !isClicked);
+
+                        // Show/hide content
+                        const contentId = `tab-content-${tab.id.split('-')[1]}`;
+                        const content = document.getElementById(contentId);
+                        if (content) {
+                            content.classList.toggle('hidden', !isClicked);
+                        }
+                    });
                 });
             });
+
 
             // --- UI Helper Functions ---
             const showLoader = (isLoading) => {
@@ -553,7 +599,7 @@
             payBtn.addEventListener('click', () => {
                 const translation = translations[currentLang];
                 if (paymentStep === 'initial') {
-                    window.open('https://common-celestia-5y.zipwp.xyz/buy/creative-vision-ai-1', '_blank');
+                    window.open('https://common-celestia-5y.zipwp.xyz/buy/creative-vision-a', '_blank');
                     payBtn.textContent = translation.payBtnConfirm;
                     paymentInstruction.classList.remove('hidden');
                     paymentStep = 'confirm';
