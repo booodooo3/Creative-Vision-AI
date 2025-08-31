@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Creative Vision AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- jsPDF and JSZip for PDF/ZIP creation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
     <!-- Fonts for both languages -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -148,6 +150,9 @@
                     <p class="mt-2 font-semibold" data-key="imagePreviewPlaceholder">معاينة الصورة</p>
                  </div>
                  <img id="edit-image-preview" src="#" alt="Image preview for editing" class="hidden">
+                 <button id="cancel-preview-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                 </button>
                  <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
 
@@ -164,22 +169,27 @@
             </div>
             <!-- Image Result -->
             <div id="image-result-container" class="w-full max-w-lg hidden relative">
+                <button id="cancel-generation-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 cursor-pointer">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
                 <img id="generated-image" class="w-full rounded-lg" alt="">
                 <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
             <!-- Article Result -->
-            <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden">
+            <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
+                <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-1 cursor-pointer">
+                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
                 <div id="article-content" class="result-text-container"></div>
             </div>
-            <!-- Payment & Download -->
+            <!-- Payment & Download Section -->
             <div id="payment-section" class="text-center hidden w-full max-w-md space-y-3">
                  <div id="payment-message" class="hidden p-3 text-sm text-green-400 bg-green-800/50 rounded-lg" role="alert">
                     <span data-key="paymentSuccess" class="font-medium"></span>
                 </div>
-                <button id="pay-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                </button>
-                 <p id="payment-instruction" data-key="paymentInstructionText" class="text-xs text-gray-400 hidden"></p>
-                <a id="download-btn" href="#" download="ai_generated_content.zip" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center inline-block">
+                <p id="payment-instruction" data-key="paymentInstructionText" class="text-sm text-gray-300"></p>
+                <div id="paypal-button-container"></div>
+                <a id="download-btn" href="#" download="ai_generated_content.zip" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center inline-block opacity-50 cursor-not-allowed">
                     <span></span>
                 </a>
             </div>
@@ -202,7 +212,7 @@
 
             // --- IMPORTANT: API Key ---
             const apiKey = "AIzaSyDHG1ON1VXbUWfoSMn9tBZq2ZAIMMdkuS4";
-
+            
 
             // --- I18N (Internationalization) ---
             const translations = {
@@ -223,9 +233,7 @@
                     loaderText: 'The AI is creating your content... This might take a moment.',
                     generatedImageAlt: 'AI Generated Image',
                     paymentSuccess: 'Payment successful! You can now download your file.',
-                    payBtnText: 'Pay $1.00 to Download',
-                    payBtnConfirm: 'Click to Confirm Payment & Unlock',
-                    paymentInstructionText: 'After paying in the new window, click the button above to unlock the download link.',
+                    paymentInstructionText: 'To unlock the download, please complete the $1.00 payment below.',
                     downloadBtnImage: 'Download Image',
                     downloadBtnZip: 'Download ZIP File',
                     errorTitleDefault: 'Operation Failed!',
@@ -259,9 +267,7 @@
                     loaderText: 'الذكاء الاصطناعي يقوم بإنشاء المحتوى الخاص بك... قد يستغرق هذا بعض الوقت.',
                     generatedImageAlt: 'صورة من إنشاء الذكاء الاصطناعي',
                     paymentSuccess: 'تم الدفع بنجاح! يمكنك الآن تنزيل ملفك.',
-                    payBtnText: 'ادفع 1.00 دولار للتنزيل',
-                    payBtnConfirm: 'انقر لتأكيد الدفع وفتح الرابط',
-                    paymentInstructionText: 'بعد الدفع في النافذة الجديدة، انقر على الزر أعلاه لفتح رابط التنزيل.',
+                    paymentInstructionText: 'لفتح رابط التنزيل، يرجى إتمام عملية الدفع بقيمة 1.00 دولار أدناه.',
                     downloadBtnImage: 'تنزيل الصورة',
                     downloadBtnZip: 'تنزيل ملف ZIP',
                     errorTitleDefault: 'فشلت العملية!',
@@ -314,7 +320,10 @@
                 langBtnEn.classList.toggle('lang-active', lang === 'en');
                 langBtnAr.classList.toggle('lang-active', lang === 'ar');
 
-                resetPaymentUI();
+                // Update UI texts if payment section is visible
+                if (!paymentSection.classList.contains('hidden')) {
+                     resetPaymentUI();
+                }
             };
 
             langBtnEn.addEventListener('click', () => setLanguage('en'));
@@ -337,10 +346,10 @@
             const generatedImage = document.getElementById('generated-image');
 
             const paymentSection = document.getElementById('payment-section');
-            const payBtn = document.getElementById('pay-btn');
-            const downloadBtn = document.getElementById('download-btn');
             const paymentMessage = document.getElementById('payment-message');
             const paymentInstruction = document.getElementById('payment-instruction');
+            const paypalButtonContainer = document.getElementById('paypal-button-container');
+            const downloadBtn = document.getElementById('download-btn');
             
             const errorBox = document.getElementById('error-message-box');
             const errorText = document.getElementById('error-text');
@@ -353,15 +362,45 @@
             const editImagePreview = document.getElementById('edit-image-preview');
             const editPrompt = document.getElementById('edit-prompt');
             const generateBtnAiEdit = document.getElementById('generate-btn-aiedit');
+            const cancelPreviewBtn = document.getElementById('cancel-preview-btn');
             let uploadedEditFile = null;
+
+            // Result cancel buttons
+            const cancelGenerationBtn = document.getElementById('cancel-generation-btn');
+            const cancelArticleBtn = document.getElementById('cancel-article-btn');
             
             // --- Prevent Default Content Actions ---
             imageResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
             editImagePreviewContainer.addEventListener('contextmenu', (e) => e.preventDefault());
             textResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            
+            // --- PayPal SDK Loader ---
+            let payPalSDKLoaded = false;
+            const loadPayPalSDK = () => {
+                return new Promise((resolve, reject) => {
+                    if (payPalSDKLoaded) {
+                        resolve();
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    /* ** خطوة مهمة **
+                      هذا هو معرف العميل (Client ID) الخاص بك. 
+                      تأكد من أنه من حساب PayPal Developer الصحيح (Sandbox للاختبار, Live للتشغيل الفعلي).
+                    */
+                    script.src = 'https://www.paypal.com/sdk/js?client-id=Afz7LD4ih71vPV0lFyTsmspbrBD8Tew27tKh1nkzIGQ5tBbQjCTXqTZohewqLiRXjJrl8yq0XLoP0NVq&currency=USD';
+                    script.onload = () => {
+                        payPalSDKLoaded = true;
+                        resolve();
+                    };
+                    script.onerror = (err) => {
+                        console.error("PayPal SDK script loading error:", err);
+                        showError("errorTitleDefault", "Failed to load payment gateway. Please refresh the page.");
+                        reject(err);
+                    };
+                    document.head.appendChild(script);
+                });
+            };
 
-
-            let paymentStep = 'initial';
             
             const checkApiKey = () => {
                 if (apiKey === "PASTE_YOUR_GOOGLE_AI_API_KEY_HERE" || !apiKey) {
@@ -371,23 +410,16 @@
                 return true;
             };
             
-            // --- Tab Switching Logic (FIXED) ---
+            // --- Tab Switching Logic ---
             tabs.forEach(clickedTab => {
                 clickedTab.addEventListener('click', () => {
-                    // Update tab appearance
                     tabs.forEach(tab => {
                         const isClicked = tab === clickedTab;
-                        
-                        // Toggle active state class
                         tab.classList.toggle('tab-active', isClicked);
-                        
-                        // Toggle inactive state classes
                         tab.classList.toggle('border-transparent', !isClicked);
                         tab.classList.toggle('text-gray-400', !isClicked);
                         tab.classList.toggle('hover:text-gray-200', !isClicked);
                         tab.classList.toggle('hover:border-gray-500', !isClicked);
-
-                        // Show/hide content
                         const contentId = `tab-content-${tab.id.split('-')[1]}`;
                         const content = document.getElementById(contentId);
                         if (content) {
@@ -428,26 +460,50 @@
 
             const resetPaymentUI = () => {
                 const translation = translations[currentLang];
-                paymentStep = 'initial';
                 const downloadBtnSpan = downloadBtn.querySelector('span');
                 
-                payBtn.textContent = translation.payBtnText;
-                
+                paymentMessage.classList.add('hidden');
+                paypalButtonContainer.classList.remove('hidden');
+                paymentInstruction.classList.remove('hidden');
+
                 if (currentDownloadData.type === 'article') {
                     if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnZip;
                 } else {
                     if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnImage;
                 }
-                payBtn.classList.remove('hidden');
-                paymentInstruction.classList.add('hidden');
+                
                 downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                paymentMessage.classList.add('hidden');
+                
+                // Render PayPal Button
+                paypalButtonContainer.innerHTML = ''; // Clear previous button
+                if (window.paypal) {
+                    paypal.Buttons({
+                        createOrder: function(data, actions) {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    amount: { value: '1.00', currency_code: 'USD' }
+                                }]
+                            });
+                        },
+                        onApprove: function(data, actions) {
+                            return actions.order.capture().then(function(details) {
+                                paymentMessage.classList.remove('hidden');
+                                paypalButtonContainer.classList.add('hidden');
+                                paymentInstruction.classList.add('hidden');
+                                downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            });
+                        },
+                        onError: function (err) {
+                            console.error('PayPal Error:', err);
+                            showError("errorTitleDefault", "An error occurred with the payment process. Please try again.");
+                        }
+                    }).render('#paypal-button-container');
+                }
             };
 
             const showPaymentUI = (type) => {
                 paymentSection.classList.remove('hidden');
-                payBtn.classList.remove('hidden');
-                downloadBtn.classList.remove('hidden');
+                downloadBtn.classList.remove('hidden'); 
                 
                 if (type === 'article') {
                     downloadBtn.download = 'ai_article.zip';
@@ -456,7 +512,7 @@
                 }
                 resetPaymentUI();
             };
-            
+
             const fileToBase64 = (file) => new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -590,23 +646,15 @@
                 }
             };
             generateBtnAiEdit.addEventListener('click', () => editAIImage(uploadedEditFile, editPrompt.value));
-
-            // --- Payment Logic ---
-            payBtn.addEventListener('click', () => {
-                const translation = translations[currentLang];
-                if (paymentStep === 'initial') {
-                    window.open('https://common-celestia-5y.zipwp.xyz/buy/creative-vision-a', '_blank');
-                    payBtn.textContent = translation.payBtnConfirm;
-                    paymentInstruction.classList.remove('hidden');
-                    paymentStep = 'confirm';
-                } else if (paymentStep === 'confirm') {
-                    paymentMessage.classList.remove('hidden');
-                    payBtn.classList.add('hidden');
-                    paymentInstruction.classList.add('hidden');
-                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            });
             
+            // --- Result Cancellation Logic ---
+            const cancelResult = () => {
+                resultSection.classList.add('hidden');
+                currentDownloadData = { type: null, content: null, title: 'content' };
+            };
+            cancelGenerationBtn.addEventListener('click', cancelResult);
+            cancelArticleBtn.addEventListener('click', cancelResult);
+
              // --- Download Logic ---
             const downloadArticleAsZip = async (title, content) => {
                 const doc = new jsPDF();
@@ -652,6 +700,20 @@
                     downloadBtn.href = currentDownloadData.content;
                 }
             });
+            
+            // --- Image Upload & Preview Reset Logic ---
+            const resetPreview = () => {
+                uploadedEditFile = null;
+                editImageUpload.value = null; 
+                editImagePreview.src = '#';
+                editImagePreview.classList.add('hidden');
+                cancelPreviewBtn.classList.add('hidden');
+                editImagePlaceholder.classList.remove('hidden');
+                editPrompt.disabled = true;
+                editPrompt.value = '';
+                generateBtnAiEdit.disabled = true;
+            };
+            cancelPreviewBtn.addEventListener('click', resetPreview);
 
             // --- Image Upload Logic (for AI Edit tab) ---
             editImageUpload.addEventListener('change', (e) => {
@@ -662,22 +724,22 @@
                         editImagePlaceholder.classList.add('hidden');
                         editImagePreview.src = event.target.result;
                         editImagePreview.classList.remove('hidden');
+                        cancelPreviewBtn.classList.remove('hidden');
                         editPrompt.disabled = false;
                         generateBtnAiEdit.disabled = false;
                     };
                     reader.readAsDataURL(uploadedEditFile);
                 } else {
-                    uploadedEditFile = null;
-                    editImagePreview.src = '#';
-                    editImagePreview.classList.add('hidden');
-                    editImagePlaceholder.classList.remove('hidden');
-                    editPrompt.disabled = true;
-                    generateBtnAiEdit.disabled = true;
+                   resetPreview();
                 }
             });
 
             // --- Initial Load ---
-            setLanguage(currentLang);
+            loadPayPalSDK().then(() => {
+                setLanguage(currentLang);
+            }).catch(err => {
+                console.error("Could not initialize app due to PayPal SDK failure.");
+            });
         });
     </script>
 
