@@ -92,13 +92,17 @@
 </head>
 <body class="bg-slate-900 text-gray-200 flex flex-col items-center justify-center min-h-screen p-4">
 
+    <!-- Language Switcher Moved Here -->
+    <div class="w-full max-w-4xl flex justify-start rtl:justify-end mb-2">
+        <div id="lang-switcher-container" class="flex space-x-2 rtl:space-x-reverse">
+            <button id="lang-btn-en" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">E</button>
+            <button id="lang-btn-ar" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">A</button>
+        </div>
+    </div>
+
     <div class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
         <!-- Header -->
-        <header class="text-center relative">
-            <div id="lang-switcher-container" class="absolute top-4 flex space-x-2 rtl:space-x-reverse">
-                <button id="lang-btn-en" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">E</button>
-                <button id="lang-btn-ar" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">A</button>
-            </div>
+        <header class="text-center">
             <h1 data-key="mainTitle" class="text-3xl md:text-4xl font-bold text-white">Creative Vision AI</h1>
             <p data-key="subtitle" class="text-gray-400 mt-2">اكتب، وأنشئ الصور بقوة الذكاء الاصطناعي.</p>
         </header>
@@ -279,7 +283,6 @@
             let currentLang = localStorage.getItem('language') || 'ar';
             let currentDownloadData = { type: null, content: null, title: 'content' };
             
-            const langSwitcherContainer = document.getElementById('lang-switcher-container');
             const langBtnEn = document.getElementById('lang-btn-en');
             const langBtnAr = document.getElementById('lang-btn-ar');
 
@@ -311,13 +314,6 @@
                 langBtnEn.classList.toggle('lang-active', lang === 'en');
                 langBtnAr.classList.toggle('lang-active', lang === 'ar');
 
-                if(lang === 'ar') {
-                    langSwitcherContainer.classList.remove('left-4');
-                    langSwitcherContainer.classList.add('right-4');
-                } else {
-                    langSwitcherContainer.classList.remove('right-4');
-                    langSwitcherContainer.classList.add('left-4');
-                }
                 resetPaymentUI();
             };
 
