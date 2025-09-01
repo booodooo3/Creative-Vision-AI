@@ -11,6 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=Afz7LD4ih71vPV0lFyTsmspbrBD8Tew27tKh1nkzIGQ5tBbQjCTXqTZohewqLiRXjJrl8yq0XLoP0NVq&currency=USD" defer></script>
+    
     <!-- Fonts for both languages -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -125,7 +128,6 @@
                 <button id="tab-article" data-key="tabArticle" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">كاتب المقالات</button>
                 <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
                 <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
-                <button id="tab-drm" data-key="tabDrm" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">حماية المحتوى</button>
             </nav>
         </div>
 
@@ -189,21 +191,6 @@
             <button id="generate-btn-translate" data-key="translateBtn" class="generate-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">ترجمة</button>
         </div>
         
-        <div id="tab-content-drm" class="tab-content hidden space-y-4">
-            <p data-key="drmIntro" class="text-gray-400 text-sm"></p>
-            <div class="space-y-3 text-gray-300">
-                <div class="flex items-center">
-                    <input id="drm-screen-record" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-slate-700 text-blue-600 focus:ring-blue-500">
-                    <label for="drm-screen-record" data-key="drmScreenRecord" class="ml-2 rtl:mr-2">منع تسجيل الشاشة (محاكاة)</label>
-                </div>
-                <div class="flex items-center">
-                    <input id="drm-watermark" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-slate-700 text-blue-600 focus:ring-blue-500">
-                    <label for="drm-watermark" data-key="drmWatermark" class="ml-2 rtl:mr-2">إضافة علامة مائية (باسم المستخدم)</label>
-                </div>
-                 <p class="text-xs text-gray-500" data-key="drmNote">ملاحظة: لحماية المحتوى، يجب أن يكون هناك محتوى تم إنشاؤه بالفعل في قسم النتائج.</p>
-            </div>
-            <button id="generate-btn-drm" data-key="drmProtectBtn" class="generate-btn w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">تطبيق الحماية</button>
-        </div>
 
         <!-- Result Section -->
         <div id="result-section" class="bg-slate-900 rounded-lg p-4 min-h-[300px] flex flex-col items-center justify-center space-y-4 hidden">
@@ -224,6 +211,9 @@
             <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
                 <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer">
                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <button id="download-translation-btn" data-key-title="downloadTranslation" class="absolute top-2 right-12 rtl:right-auto rtl:left-12 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer hidden">
+                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
                 <div id="article-content" class="result-text-container"></div>
             </div>
@@ -268,7 +258,6 @@
                     tabArticle: 'AI Article Writer',
                     tabAiEdit: 'AI Image Editing',
                     tabTranslate: 'Text Translation',
-                    tabDrm: 'DRM Protection',
                     textPlaceholder: 'Example: An astronaut riding a horse on Mars, cinematic style...',
                     generateBtn: 'Generate Image',
                     articleTitlePlaceholder: 'Enter the article title here...',
@@ -280,14 +269,7 @@
                     targetLangLabel: 'To Language',
                     translatePlaceholder: 'Enter text to translate here...',
                     translateBtn: 'Translate',
-                    drmIntro: 'Apply protection to your content. This feature applies visible security (watermarks) and simulated restrictions (disabling copy in PDF) to demonstrate how DRM systems work. Real, unbreakable protection requires a server.',
-                    drmScreenRecord: 'Prevent screen recording (Simulated)',
-                    drmWatermark: 'Add dynamic watermark (with username)',
-                    drmNote: 'Note: To protect content, there must be content already generated in the result section.',
-                    drmProtectBtn: 'Apply Protection',
-                    drmSuccessMessage: 'Content protection has been applied. The downloadable file will now include the selected security features.',
-                    errorNoContentToProtect: 'There is no generated content to protect. Please generate an image or article first.',
-                    errorNoProtectionSelected: 'Please select at least one protection option.',
+                    downloadTranslation: 'Download translation (payment required)',
                     imagePreviewPlaceholder: 'Image Preview',
                     loaderText: 'The AI is creating your content... This might take a moment.',
                     generatedImageAlt: 'AI Generated Image',
@@ -317,7 +299,6 @@
                     tabArticle: 'كاتب المقالات',
                     tabAiEdit: 'تعديل الصور',
                     tabTranslate: 'ترجمة النصوص',
-                    tabDrm: 'حماية المحتوى',
                     textPlaceholder: 'مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي...',
                     generateBtn: 'إنشاء صورة',
                     articleTitlePlaceholder: 'اكتب عنوان المقال هنا...',
@@ -329,14 +310,7 @@
                     targetLangLabel: 'إلى لغة',
                     translatePlaceholder: 'اكتب النص الذي تريد ترجمته هنا...',
                     translateBtn: 'ترجمة',
-                    drmIntro: 'تطبيق حماية على المحتوى الخاص بك. هذه الميزة تطبق تقنيات حماية مرئية (علامة مائية) ومحاكاة للقيود (منع النسخ في PDF) لإظهار كيف تعمل أنظمة DRM. الحماية الحقيقية تتطلب خادمًا.',
-                    drmScreenRecord: 'منع تسجيل الشاشة (محاكاة)',
-                    drmWatermark: 'إضافة علامة مائية (باسم المستخدم)',
-                    drmNote: 'ملاحظة: لحماية المحتوى، يجب أن يكون هناك محتوى تم إنشاؤه بالفعل في قسم النتائج.',
-                    drmProtectBtn: 'تطبيق الحماية',
-                    drmSuccessMessage: 'تم تطبيق حماية المحتوى. الملف القابل للتنزيل سيتضمن الآن مزايا الأمان المحددة.',
-                    errorNoContentToProtect: 'لا يوجد محتوى تم إنشاؤه لحمايته. الرجاء إنشاء صورة أو مقال أولاً.',
-                    errorNoProtectionSelected: 'الرجاء تحديد خيار حماية واحد على الأقل.',
+                    downloadTranslation: 'تنزيل الترجمة (الدفع مطلوب)',
                     imagePreviewPlaceholder: 'معاينة الصورة',
                     loaderText: 'الذكاء الاصطناعي يقوم بإنشاء المحتوى الخاص بك... قد يستغرق هذا بعض الوقت.',
                     generatedImageAlt: 'صورة من إنشاء الذكاء الاصطناعي',
@@ -389,6 +363,13 @@
                         element.placeholder = translation[key];
                     }
                 });
+
+                document.querySelectorAll('[data-key-title]').forEach(element => {
+                    const key = element.getAttribute('data-key-title');
+                    if (translation[key]) {
+                        element.title = translation[key];
+                    }
+                });
                 
                 document.getElementById('generated-image').alt = translation.generatedImageAlt;
 
@@ -418,9 +399,7 @@
             const translateInput = document.getElementById('translate-input');
             const sourceLang = document.getElementById('source-lang');
             const targetLang = document.getElementById('target-lang');
-
-            // DRM elements
-            const generateBtnDrm = document.getElementById('generate-btn-drm');
+            const downloadTranslationBtn = document.getElementById('download-translation-btn');
 
             const resultSection = document.getElementById('result-section');
             const loader = document.getElementById('loader');
@@ -458,30 +437,6 @@
             editImagePreviewContainer.addEventListener('contextmenu', (e) => e.preventDefault());
             textResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
             
-            // --- PayPal SDK Loader ---
-            let payPalSDKLoaded = false;
-            const loadPayPalSDK = () => {
-                return new Promise((resolve, reject) => {
-                    if (payPalSDKLoaded) {
-                        resolve();
-                        return;
-                    }
-                    const script = document.createElement('script');
-                    script.src = 'https://www.paypal.com/sdk/js?client-id=Afz7LD4ih71vPV0lFyTsmspbrBD8Tew27tKh1nkzIGQ5tBbQjCTXqTZohewqLiRXjJrl8yq0XLoP0NVq&currency=USD';
-                    script.onload = () => {
-                        payPalSDKLoaded = true;
-                        resolve();
-                    };
-                    script.onerror = (err) => {
-                        console.error("PayPal SDK script loading error:", err);
-                        showError("errorTitleDefault", "Failed to load payment gateway. Please refresh the page.");
-                        reject(err);
-                    };
-                    document.head.appendChild(script);
-                });
-            };
-
-            
             const checkApiKey = () => {
                 if (apiKey === "PASTE_YOUR_GOOGLE_AI_API_KEY_HERE" || !apiKey) {
                     showError("errorInputTitle", "errorApiKey");
@@ -512,7 +467,7 @@
 
             // --- UI Helper Functions ---
             const showLoader = (isLoading) => {
-                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit, generateBtnTranslate, generateBtnDrm];
+                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit, generateBtnTranslate];
                 if (isLoading) {
                     resultSection.classList.remove('hidden');
                     loader.classList.remove('hidden');
@@ -546,7 +501,7 @@
                 paypalButtonContainer.classList.remove('hidden');
                 paymentInstruction.classList.remove('hidden');
 
-                if (currentDownloadData.type === 'article') {
+                if (currentDownloadData.type === 'article' || currentDownloadData.type === 'translation') {
                     if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnZip;
                 } else {
                     if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnImage;
@@ -557,27 +512,34 @@
                 // Render PayPal Button
                 paypalButtonContainer.innerHTML = ''; // Clear previous button
                 if (window.paypal) {
-                    paypal.Buttons({
-                        createOrder: function(data, actions) {
-                            return actions.order.create({
-                                purchase_units: [{
-                                    amount: { value: '1.00', currency_code: 'USD' }
-                                }]
-                            });
-                        },
-                        onApprove: function(data, actions) {
-                            return actions.order.capture().then(function(details) {
-                                paymentMessage.classList.remove('hidden');
-                                paypalButtonContainer.classList.add('hidden');
-                                paymentInstruction.classList.add('hidden');
-                                downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                            });
-                        },
-                        onError: function (err) {
-                            console.error('PayPal Error:', err);
-                            showError("errorTitleDefault", "An error occurred with the payment process. Please try again.");
-                        }
-                    }).render('#paypal-button-container');
+                    try {
+                        paypal.Buttons({
+                            createOrder: function(data, actions) {
+                                return actions.order.create({
+                                    purchase_units: [{
+                                        amount: { value: '1.00', currency_code: 'USD' }
+                                    }]
+                                });
+                            },
+                            onApprove: function(data, actions) {
+                                return actions.order.capture().then(function(details) {
+                                    paymentMessage.classList.remove('hidden');
+                                    paypalButtonContainer.classList.add('hidden');
+                                    paymentInstruction.classList.add('hidden');
+                                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                                });
+                            },
+                            onError: function (err) {
+                                console.error('PayPal Error:', err);
+                                showError("errorTitleDefault", "An error occurred with the payment process. Please try again.");
+                            }
+                        }).render('#paypal-button-container');
+                    } catch (err) {
+                        console.error("Error rendering PayPal buttons:", err);
+                        showError("errorTitleDefault", "Could not display payment options. Please refresh.");
+                    }
+                } else {
+                     showError("errorTitleDefault", "Failed to load payment gateway. Please refresh the page.");
                 }
             };
 
@@ -585,8 +547,8 @@
                 paymentSection.classList.remove('hidden');
                 downloadBtn.classList.remove('hidden'); 
                 
-                if (type === 'article') {
-                    downloadBtn.download = 'ai_article.zip';
+                if (type === 'article' || type === 'translation') {
+                    downloadBtn.download = 'ai_content.zip';
                 } else {
                     downloadBtn.download = 'ai_generated_image.png';
                 }
@@ -605,6 +567,7 @@
                 if (!checkApiKey()) return;
                 if (!prompt.trim()) return showError("errorInputTitle", "errorInputText");
                 showLoader(true);
+                downloadTranslationBtn.classList.add('hidden');
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
                 const payload = { instances: [{ prompt }], parameters: { "sampleCount": 1 } };
 
@@ -640,6 +603,7 @@
                 if (!checkApiKey()) return;
                 if (!title.trim()) return showError("errorInputTitle", "errorInputArticle");
                 showLoader(true);
+                downloadTranslationBtn.classList.add('hidden');
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const systemPrompt = "You are a professional article writer. Write a comprehensive article about the given title. The article should be well-structured with an introduction, body, and conclusion. Use clear and informative language.";
                 const payload = { contents: [{ parts: [{ text: `Write an article about: "${title}"` }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
@@ -686,6 +650,7 @@
                     
                     const translatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (translatedText) {
+                        currentDownloadData = { type: 'translation', content: translatedText, title: 'translation' };
                         articleContent.textContent = translatedText;
                         
                         const rtlLangs = ['Arabic', 'Hebrew', 'Aramaic', 'Syriac'];
@@ -699,7 +664,8 @@
 
                         imageResultContainer.classList.add('hidden');
                         textResultContainer.classList.remove('hidden');
-                        paymentSection.classList.add('hidden');
+                        downloadTranslationBtn.classList.remove('hidden');
+                        paymentSection.classList.add('hidden'); // Hide payment until download icon is clicked
                     } else {
                         throw new Error(translations[currentLang].errorNoText);
                     }
@@ -712,6 +678,10 @@
                 }
             };
             generateBtnTranslate.addEventListener('click', () => translateText(translateInput.value, sourceLang.value, targetLang.value));
+            
+            downloadTranslationBtn.addEventListener('click', () => {
+                showPaymentUI('translation');
+            });
 
             // --- DRM Protection Logic ---
             const applyImageProtection = (imageUrl) => {
@@ -725,122 +695,25 @@
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
 
-                        const watermarkCheckbox = document.getElementById('drm-watermark');
-                        const screenRecordCheckbox = document.getElementById('drm-screen-record');
-
-                        if (screenRecordCheckbox.checked) {
-                             ctx.font = 'bold 48px Arial';
-                             ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-                             ctx.save();
-                             ctx.translate(canvas.width/2, canvas.height/2);
-                             ctx.rotate(-0.785); // 45 degrees
-                             ctx.fillText('PROTECTED', 0, 0);
-                             ctx.restore();
-                        }
-                        if (watermarkCheckbox.checked) {
-                            ctx.font = `bold ${Math.max(24, canvas.width / 25)}px Arial`;
-                            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                            ctx.textAlign = 'center';
-                            ctx.fillText('User: boood0003', canvas.width / 2, canvas.height - 30);
-                        }
+                        // Always apply screen recording protection simulation
+                        ctx.font = 'bold 48px Arial';
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+                        ctx.save();
+                        ctx.translate(canvas.width/2, canvas.height/2);
+                        ctx.rotate(-0.785); // 45 degrees
+                        ctx.textAlign = 'center';
+                        ctx.fillText('PROTECTED', 0, 0);
+                        ctx.restore();
                         
                         resolve(canvas.toDataURL('image/png'));
                     };
+                    img.onerror = () => {
+                        showError("errorTitleDefault", "Failed to load image for protection.");
+                        resolve(null); // Resolve with null if image fails to load
+                    }
                     img.src = imageUrl;
                 });
             };
-
-            const downloadProtectedArticleAsZip = async (title, content) => {
-                 const doc = new jsPDF();
-                 const zip = new JSZip();
-
-                 doc.setLanguage('ar');
-                 doc.setFont('Helvetica', 'normal');
-                 const lines = doc.splitTextToSize(content, 180);
-
-                 const pageHeight = doc.internal.pageSize.height;
-                 const pageWidth = doc.internal.pageSize.width;
-                 let y = 15;
-                 
-                 const addWatermark = (pdfDoc) => {
-                     const watermarkCheckbox = document.getElementById('drm-watermark');
-                     const screenRecordCheckbox = document.getElementById('drm-screen-record');
-                     if (!watermarkCheckbox.checked && !screenRecordCheckbox.checked) return;
-                     
-                     const totalPages = pdfDoc.internal.getNumberOfPages();
-                     for (let i = 1; i <= totalPages; i++) {
-                         pdfDoc.setPage(i);
-                         pdfDoc.saveGraphicsState();
-                         pdfDoc.setFontSize(50);
-                         pdfDoc.setGState(new doc.GState({opacity: 0.3}));
-                         
-                         if (screenRecordCheckbox.checked) {
-                             pdfDoc.setTextColor(255, 0, 0);
-                             pdfDoc.text('PROTECTED', pageWidth / 2, pageHeight / 1.8, { align: 'center', angle: 45 });
-                         }
-                         if (watermarkCheckbox.checked) {
-                             pdfDoc.setTextColor(100);
-                             pdfDoc.text('User: boood0003', pageWidth / 2, pageHeight / 2, { align: 'center', angle: 45 });
-                         }
-                         pdfDoc.restoreGraphicsState();
-                     }
-                 };
-
-                 for(let i = 0; i < lines.length; i++) {
-                    if (y > pageHeight - 20) {
-                        doc.addPage();
-                        y = 15;
-                    }
-                    doc.text(lines[i], doc.internal.pageSize.width - 15, y, { align: 'right' });
-                    y += 7;
-                 }
-                 
-                 addWatermark(doc);
-                
-                const pdfBlob = doc.output('blob');
-                zip.file(`${title.replace(/ /g, "_")}_protected.pdf`, pdfBlob);
-                
-                const zipBlob = await zip.generateAsync({ type: "blob" });
-                const url = URL.createObjectURL(zipBlob);
-                const tempLink = document.createElement('a');
-                tempLink.href = url;
-                tempLink.download = 'ai_protected_article.zip';
-                tempLink.click();
-                URL.revokeObjectURL(url);
-            };
-
-            generateBtnDrm.addEventListener('click', async () => {
-                if (!currentDownloadData.content) {
-                    showError("errorInputTitle", "errorNoContentToProtect");
-                    return;
-                }
-                
-                const screenRecordCheckbox = document.getElementById('drm-screen-record');
-                const watermarkCheckbox = document.getElementById('drm-watermark');
-                if (!screenRecordCheckbox.checked && !watermarkCheckbox.checked) {
-                    showError("errorInputTitle", "errorNoProtectionSelected");
-                    return;
-                }
-
-                showLoader(true);
-                
-                if (currentDownloadData.type.includes('image')) {
-                    const protectedImageUrl = await applyImageProtection(currentDownloadData.content);
-                    currentDownloadData.protectedContent = protectedImageUrl;
-                    generatedImage.src = protectedImageUrl;
-                    imageResultContainer.classList.remove('hidden');
-                    textResultContainer.classList.add('hidden');
-                } else {
-                    imageResultContainer.classList.add('hidden');
-                    textResultContainer.classList.remove('hidden');
-                }
-                
-                articleContent.textContent = translations[currentLang].drmSuccessMessage;
-                
-                downloadBtn.dataset.protected = "true";
-                showPaymentUI(currentDownloadData.type);
-                showLoader(false);
-            });
 
 
             // --- Real AI Image Editing (Image-to-Image) ---
@@ -848,7 +721,7 @@
                 if (!checkApiKey()) return;
                 if (!file || !prompt.trim()) return showError("errorInputTitle", "errorInputEdit");
                 showLoader(true);
-
+                downloadTranslationBtn.classList.add('hidden');
                 try {
                     const base64Data = await fileToBase64(file);
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
@@ -888,6 +761,7 @@
             // --- Result Cancellation Logic ---
             const cancelResult = () => {
                 resultSection.classList.add('hidden');
+                downloadTranslationBtn.classList.add('hidden');
                 currentDownloadData = { type: null, content: null, title: 'content' };
             };
             cancelGenerationBtn.addEventListener('click', cancelResult);
@@ -898,59 +772,76 @@
                 const doc = new jsPDF();
                 const zip = new JSZip();
 
+                 // Add a font that supports Arabic, like "Amiri"
+                 // Note: jsPDF has limited support for RTL and Arabic characters without plugins or custom fonts.
+                 // This is a basic implementation. For perfect rendering, a library like jspdf-autotable with font support is needed.
+                 doc.setFont('Helvetica'); // Fallback font
                  doc.setLanguage('ar');
-                 doc.setFont('Helvetica', 'normal');
+                 
                  const lines = doc.splitTextToSize(content, 180);
 
                  const pageHeight = doc.internal.pageSize.height;
+                 const pageWidth = doc.internal.pageSize.width;
                  let y = 15;
+                 
+                 const addWatermark = (pdfDoc) => {
+                     const totalPages = pdfDoc.internal.getNumberOfPages();
+                     for (let i = 1; i <= totalPages; i++) {
+                         pdfDoc.setPage(i);
+                         pdfDoc.saveGraphicsState();
+                         pdfDoc.setFontSize(50);
+                         pdfDoc.setGState(new doc.GState({opacity: 0.3}));
+                         
+                         // Always apply screen recording protection simulation
+                         pdfDoc.setTextColor(255, 0, 0);
+                         pdfDoc.text('PROTECTED', pageWidth / 2, pageHeight / 1.8, { align: 'center', angle: 45 });
+                         
+                         pdfDoc.restoreGraphicsState();
+                     }
+                 };
+
                  for(let i = 0; i < lines.length; i++) {
-                    if (y > pageHeight - 15) {
+                    if (y > pageHeight - 20) {
                         doc.addPage();
                         y = 15;
                     }
-                    doc.text(lines[i], doc.internal.pageSize.width - 15, y, { align: 'right' });
+                    // Writing text from right to left
+                    doc.text(lines[i], pageWidth - 15, y, { align: 'right' });
                     y += 7;
                  }
-
+                 
+                 addWatermark(doc);
+                
                 const pdfBlob = doc.output('blob');
-                zip.file(`${title.replace(/ /g, "_")}.pdf`, pdfBlob);
+                zip.file(`${title.replace(/ /g, "_")}_protected.pdf`, pdfBlob);
                 
                 const zipBlob = await zip.generateAsync({ type: "blob" });
                 const url = URL.createObjectURL(zipBlob);
                 const tempLink = document.createElement('a');
                 tempLink.href = url;
-                tempLink.download = 'ai_article.zip';
+                tempLink.download = 'ai_protected_content.zip';
                 tempLink.click();
                 URL.revokeObjectURL(url);
             };
 
-            downloadBtn.addEventListener('click', (event) => {
+            downloadBtn.addEventListener('click', async (event) => {
                 event.preventDefault();
                 if (downloadBtn.classList.contains('cursor-not-allowed')) {
                     showError("errorPaymentTitle", "errorPaymentText");
                     return;
                 }
                 
-                const isProtected = downloadBtn.dataset.protected === "true";
-                
-                if (currentDownloadData.type === 'article' && isProtected) {
-                    downloadProtectedArticleAsZip(currentDownloadData.title, currentDownloadData.content);
-                } else if (currentDownloadData.type === 'article') {
-                    downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
-                } else if (currentDownloadData.type.includes('image') && isProtected){
-                    const tempLink = document.createElement('a');
-                    tempLink.href = currentDownloadData.protectedContent;
-                    tempLink.download = 'ai_protected_image.png';
-                    tempLink.click();
-                } else {
-                    const tempLink = document.createElement('a');
-                    tempLink.href = currentDownloadData.content;
-                    tempLink.download = 'ai_generated_image.png';
-                    tempLink.click();
+                if (currentDownloadData.type === 'article' || currentDownloadData.type === 'translation') {
+                    await downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
+                } else if (currentDownloadData.type.includes('image')){
+                    const protectedImageUrl = await applyImageProtection(currentDownloadData.content);
+                    if (protectedImageUrl) {
+                        const tempLink = document.createElement('a');
+                        tempLink.href = protectedImageUrl;
+                        tempLink.download = 'ai_protected_image.png';
+                        tempLink.click();
+                    }
                 }
-                
-                downloadBtn.dataset.protected = "false";
             });
             
             // --- Image Upload & Preview Reset Logic ---
@@ -987,11 +878,7 @@
             });
 
             // --- Initial Load ---
-            loadPayPalSDK().then(() => {
-                setLanguage(currentLang);
-            }).catch(err => {
-                console.error("Could not initialize app due to PayPal SDK failure.");
-            });
+            setLanguage(currentLang);
         });
     </script>
 
