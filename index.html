@@ -124,6 +124,8 @@
                 <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
                 <button id="tab-article" data-key="tabArticle" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">كاتب المقالات</button>
                 <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
+                <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
+                <button id="tab-drm" data-key="tabDrm" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">حماية المحتوى</button>
             </nav>
         </div>
 
@@ -159,6 +161,49 @@
             <textarea id="edit-prompt" data-key-placeholder="editPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-600" placeholder="مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة..." disabled></textarea>
             <button id="generate-btn-aiedit" data-key="editBtn" class="generate-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>تطبيق التعديلات</button>
         </div>
+        
+        <div id="tab-content-translate" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="source-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="sourceLangLabel">من لغة</label>
+                    <select id="source-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Arabic">العربية</option>
+                        <option value="English">English</option>
+                        <option value="Hebrew">עברית</option>
+                        <option value="Aramaic">Aramaic</option>
+                        <option value="Syriac">Syriac</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="target-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="targetLangLabel">إلى لغة</label>
+                    <select id="target-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="English" selected>English</option>
+                        <option value="Arabic">العربية</option>
+                        <option value="Hebrew">עברית</option>
+                        <option value="Aramaic">Aramaic</option>
+                        <option value="Syriac">Syriac</option>
+                    </select>
+                </div>
+            </div>
+            <textarea id="translate-input" data-key-placeholder="translatePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="اكتب النص الذي تريد ترجمته هنا..."></textarea>
+            <button id="generate-btn-translate" data-key="translateBtn" class="generate-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">ترجمة</button>
+        </div>
+        
+        <div id="tab-content-drm" class="tab-content hidden space-y-4">
+            <p data-key="drmIntro" class="text-gray-400 text-sm"></p>
+            <div class="space-y-3 text-gray-300">
+                <div class="flex items-center">
+                    <input id="drm-screen-record" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-slate-700 text-blue-600 focus:ring-blue-500">
+                    <label for="drm-screen-record" data-key="drmScreenRecord" class="ml-2 rtl:mr-2">منع تسجيل الشاشة (محاكاة)</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="drm-watermark" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-slate-700 text-blue-600 focus:ring-blue-500">
+                    <label for="drm-watermark" data-key="drmWatermark" class="ml-2 rtl:mr-2">إضافة علامة مائية (باسم المستخدم)</label>
+                </div>
+                 <p class="text-xs text-gray-500" data-key="drmNote">ملاحظة: لحماية المحتوى، يجب أن يكون هناك محتوى تم إنشاؤه بالفعل في قسم النتائج.</p>
+            </div>
+            <button id="generate-btn-drm" data-key="drmProtectBtn" class="generate-btn w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">تطبيق الحماية</button>
+        </div>
 
         <!-- Result Section -->
         <div id="result-section" class="bg-slate-900 rounded-lg p-4 min-h-[300px] flex flex-col items-center justify-center space-y-4 hidden">
@@ -175,9 +220,9 @@
                 <img id="generated-image" class="w-full rounded-lg" alt="">
                 <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
-            <!-- Article Result -->
+            <!-- Article/Translation Result -->
             <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
-                <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-1 cursor-pointer">
+                <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer">
                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 <div id="article-content" class="result-text-container"></div>
@@ -222,6 +267,8 @@
                     tabText: 'Text to Image',
                     tabArticle: 'AI Article Writer',
                     tabAiEdit: 'AI Image Editing',
+                    tabTranslate: 'Text Translation',
+                    tabDrm: 'DRM Protection',
                     textPlaceholder: 'Example: An astronaut riding a horse on Mars, cinematic style...',
                     generateBtn: 'Generate Image',
                     articleTitlePlaceholder: 'Enter the article title here...',
@@ -229,6 +276,18 @@
                     uploadForEditing: 'Upload an Image to Start Editing',
                     editPlaceholder: 'e.g., change hair color to blonde, add a hat...',
                     editBtn: 'Apply Edits',
+                    sourceLangLabel: 'From Language',
+                    targetLangLabel: 'To Language',
+                    translatePlaceholder: 'Enter text to translate here...',
+                    translateBtn: 'Translate',
+                    drmIntro: 'Apply protection to your content. This feature applies visible security (watermarks) and simulated restrictions (disabling copy in PDF) to demonstrate how DRM systems work. Real, unbreakable protection requires a server.',
+                    drmScreenRecord: 'Prevent screen recording (Simulated)',
+                    drmWatermark: 'Add dynamic watermark (with username)',
+                    drmNote: 'Note: To protect content, there must be content already generated in the result section.',
+                    drmProtectBtn: 'Apply Protection',
+                    drmSuccessMessage: 'Content protection has been applied. The downloadable file will now include the selected security features.',
+                    errorNoContentToProtect: 'There is no generated content to protect. Please generate an image or article first.',
+                    errorNoProtectionSelected: 'Please select at least one protection option.',
                     imagePreviewPlaceholder: 'Image Preview',
                     loaderText: 'The AI is creating your content... This might take a moment.',
                     generatedImageAlt: 'AI Generated Image',
@@ -241,6 +300,7 @@
                     errorInputText: 'Please enter a text prompt to generate the image.',
                     errorInputArticle: 'Please enter a title for the article.',
                     errorInputEdit: 'Please upload an image and provide an edit instruction.',
+                    errorInputTranslate: 'Please enter text to translate.',
                     errorPaymentTitle: 'Payment Required',
                     errorPaymentText: 'Please complete the payment process to enable the download link.',
                     errorApiLimit: 'You have reached the request limit. Please try again later.',
@@ -256,6 +316,8 @@
                     tabText: 'نص إلى صورة',
                     tabArticle: 'كاتب المقالات',
                     tabAiEdit: 'تعديل الصور',
+                    tabTranslate: 'ترجمة النصوص',
+                    tabDrm: 'حماية المحتوى',
                     textPlaceholder: 'مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي...',
                     generateBtn: 'إنشاء صورة',
                     articleTitlePlaceholder: 'اكتب عنوان المقال هنا...',
@@ -263,6 +325,18 @@
                     uploadForEditing: 'ارفع صورة لبدء التعديل',
                     editPlaceholder: 'مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة...',
                     editBtn: 'تطبيق التعديلات',
+                    sourceLangLabel: 'من لغة',
+                    targetLangLabel: 'إلى لغة',
+                    translatePlaceholder: 'اكتب النص الذي تريد ترجمته هنا...',
+                    translateBtn: 'ترجمة',
+                    drmIntro: 'تطبيق حماية على المحتوى الخاص بك. هذه الميزة تطبق تقنيات حماية مرئية (علامة مائية) ومحاكاة للقيود (منع النسخ في PDF) لإظهار كيف تعمل أنظمة DRM. الحماية الحقيقية تتطلب خادمًا.',
+                    drmScreenRecord: 'منع تسجيل الشاشة (محاكاة)',
+                    drmWatermark: 'إضافة علامة مائية (باسم المستخدم)',
+                    drmNote: 'ملاحظة: لحماية المحتوى، يجب أن يكون هناك محتوى تم إنشاؤه بالفعل في قسم النتائج.',
+                    drmProtectBtn: 'تطبيق الحماية',
+                    drmSuccessMessage: 'تم تطبيق حماية المحتوى. الملف القابل للتنزيل سيتضمن الآن مزايا الأمان المحددة.',
+                    errorNoContentToProtect: 'لا يوجد محتوى تم إنشاؤه لحمايته. الرجاء إنشاء صورة أو مقال أولاً.',
+                    errorNoProtectionSelected: 'الرجاء تحديد خيار حماية واحد على الأقل.',
                     imagePreviewPlaceholder: 'معاينة الصورة',
                     loaderText: 'الذكاء الاصطناعي يقوم بإنشاء المحتوى الخاص بك... قد يستغرق هذا بعض الوقت.',
                     generatedImageAlt: 'صورة من إنشاء الذكاء الاصطناعي',
@@ -275,6 +349,7 @@
                     errorInputText: 'الرجاء إدخال وصف نصي لإنشاء الصورة.',
                     errorInputArticle: 'الرجاء إدخال عنوان للمقال.',
                     errorInputEdit: 'الرجاء رفع صورة وتقديم تعليمات التعديل.',
+                    errorInputTranslate: 'الرجاء إدخال نص للترجمة.',
                     errorPaymentTitle: 'الدفع مطلوب',
                     errorPaymentText: 'يرجى إتمام عملية الدفع لتفعيل رابط التنزيل.',
                     errorApiLimit: 'لقد وصلت إلى حد الطلبات. يرجى المحاولة مرة أخرى لاحقًا.',
@@ -337,6 +412,15 @@
             const generateBtnText = document.getElementById('generate-btn-text');
             const articleTitle = document.getElementById('article-title');
             const generateBtnArticle = document.getElementById('generate-btn-article');
+            
+            // Translation elements
+            const generateBtnTranslate = document.getElementById('generate-btn-translate');
+            const translateInput = document.getElementById('translate-input');
+            const sourceLang = document.getElementById('source-lang');
+            const targetLang = document.getElementById('target-lang');
+
+            // DRM elements
+            const generateBtnDrm = document.getElementById('generate-btn-drm');
 
             const resultSection = document.getElementById('result-section');
             const loader = document.getElementById('loader');
@@ -383,10 +467,6 @@
                         return;
                     }
                     const script = document.createElement('script');
-                    /* ** خطوة مهمة **
-                      هذا هو معرف العميل (Client ID) الخاص بك. 
-                      تأكد من أنه من حساب PayPal Developer الصحيح (Sandbox للاختبار, Live للتشغيل الفعلي).
-                    */
                     script.src = 'https://www.paypal.com/sdk/js?client-id=Afz7LD4ih71vPV0lFyTsmspbrBD8Tew27tKh1nkzIGQ5tBbQjCTXqTZohewqLiRXjJrl8yq0XLoP0NVq&currency=USD';
                     script.onload = () => {
                         payPalSDKLoaded = true;
@@ -432,7 +512,7 @@
 
             // --- UI Helper Functions ---
             const showLoader = (isLoading) => {
-                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit];
+                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit, generateBtnTranslate, generateBtnDrm];
                 if (isLoading) {
                     resultSection.classList.remove('hidden');
                     loader.classList.remove('hidden');
@@ -589,6 +669,180 @@
             };
             generateBtnArticle.addEventListener('click', () => generateAIArticle(articleTitle.value));
 
+            // --- AI Text Translation ---
+            const translateText = async (text, source, target) => {
+                if (!checkApiKey()) return;
+                if (!text.trim()) return showError("errorInputTitle", "errorInputTranslate");
+                showLoader(true);
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = `You are an expert multilingual translator. Translate the user's text accurately from the source language to the target language. Provide only the translated text as the output, with no additional commentary or explanations.`;
+                const userPrompt = `Translate the following text from ${source} to ${target}:\n\n"${text}"`;
+                const payload = { contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+                    
+                    const translatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (translatedText) {
+                        articleContent.textContent = translatedText;
+                        
+                        const rtlLangs = ['Arabic', 'Hebrew', 'Aramaic', 'Syriac'];
+                        if (rtlLangs.includes(target)) {
+                            articleContent.parentElement.dir = 'rtl';
+                            articleContent.style.textAlign = 'right';
+                        } else {
+                            articleContent.parentElement.dir = 'ltr';
+                            articleContent.style.textAlign = 'left';
+                        }
+
+                        imageResultContainer.classList.add('hidden');
+                        textResultContainer.classList.remove('hidden');
+                        paymentSection.classList.add('hidden');
+                    } else {
+                        throw new Error(translations[currentLang].errorNoText);
+                    }
+                } catch (error) {
+                    console.error("AI Translation Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            generateBtnTranslate.addEventListener('click', () => translateText(translateInput.value, sourceLang.value, targetLang.value));
+
+            // --- DRM Protection Logic ---
+            const applyImageProtection = (imageUrl) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        const watermarkCheckbox = document.getElementById('drm-watermark');
+                        const screenRecordCheckbox = document.getElementById('drm-screen-record');
+
+                        if (screenRecordCheckbox.checked) {
+                             ctx.font = 'bold 48px Arial';
+                             ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+                             ctx.save();
+                             ctx.translate(canvas.width/2, canvas.height/2);
+                             ctx.rotate(-0.785); // 45 degrees
+                             ctx.fillText('PROTECTED', 0, 0);
+                             ctx.restore();
+                        }
+                        if (watermarkCheckbox.checked) {
+                            ctx.font = `bold ${Math.max(24, canvas.width / 25)}px Arial`;
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('User: boood0003', canvas.width / 2, canvas.height - 30);
+                        }
+                        
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.src = imageUrl;
+                });
+            };
+
+            const downloadProtectedArticleAsZip = async (title, content) => {
+                 const doc = new jsPDF();
+                 const zip = new JSZip();
+
+                 doc.setLanguage('ar');
+                 doc.setFont('Helvetica', 'normal');
+                 const lines = doc.splitTextToSize(content, 180);
+
+                 const pageHeight = doc.internal.pageSize.height;
+                 const pageWidth = doc.internal.pageSize.width;
+                 let y = 15;
+                 
+                 const addWatermark = (pdfDoc) => {
+                     const watermarkCheckbox = document.getElementById('drm-watermark');
+                     const screenRecordCheckbox = document.getElementById('drm-screen-record');
+                     if (!watermarkCheckbox.checked && !screenRecordCheckbox.checked) return;
+                     
+                     const totalPages = pdfDoc.internal.getNumberOfPages();
+                     for (let i = 1; i <= totalPages; i++) {
+                         pdfDoc.setPage(i);
+                         pdfDoc.saveGraphicsState();
+                         pdfDoc.setFontSize(50);
+                         pdfDoc.setGState(new doc.GState({opacity: 0.3}));
+                         
+                         if (screenRecordCheckbox.checked) {
+                             pdfDoc.setTextColor(255, 0, 0);
+                             pdfDoc.text('PROTECTED', pageWidth / 2, pageHeight / 1.8, { align: 'center', angle: 45 });
+                         }
+                         if (watermarkCheckbox.checked) {
+                             pdfDoc.setTextColor(100);
+                             pdfDoc.text('User: boood0003', pageWidth / 2, pageHeight / 2, { align: 'center', angle: 45 });
+                         }
+                         pdfDoc.restoreGraphicsState();
+                     }
+                 };
+
+                 for(let i = 0; i < lines.length; i++) {
+                    if (y > pageHeight - 20) {
+                        doc.addPage();
+                        y = 15;
+                    }
+                    doc.text(lines[i], doc.internal.pageSize.width - 15, y, { align: 'right' });
+                    y += 7;
+                 }
+                 
+                 addWatermark(doc);
+                
+                const pdfBlob = doc.output('blob');
+                zip.file(`${title.replace(/ /g, "_")}_protected.pdf`, pdfBlob);
+                
+                const zipBlob = await zip.generateAsync({ type: "blob" });
+                const url = URL.createObjectURL(zipBlob);
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.download = 'ai_protected_article.zip';
+                tempLink.click();
+                URL.revokeObjectURL(url);
+            };
+
+            generateBtnDrm.addEventListener('click', async () => {
+                if (!currentDownloadData.content) {
+                    showError("errorInputTitle", "errorNoContentToProtect");
+                    return;
+                }
+                
+                const screenRecordCheckbox = document.getElementById('drm-screen-record');
+                const watermarkCheckbox = document.getElementById('drm-watermark');
+                if (!screenRecordCheckbox.checked && !watermarkCheckbox.checked) {
+                    showError("errorInputTitle", "errorNoProtectionSelected");
+                    return;
+                }
+
+                showLoader(true);
+                
+                if (currentDownloadData.type.includes('image')) {
+                    const protectedImageUrl = await applyImageProtection(currentDownloadData.content);
+                    currentDownloadData.protectedContent = protectedImageUrl;
+                    generatedImage.src = protectedImageUrl;
+                    imageResultContainer.classList.remove('hidden');
+                    textResultContainer.classList.add('hidden');
+                } else {
+                    imageResultContainer.classList.add('hidden');
+                    textResultContainer.classList.remove('hidden');
+                }
+                
+                articleContent.textContent = translations[currentLang].drmSuccessMessage;
+                
+                downloadBtn.dataset.protected = "true";
+                showPaymentUI(currentDownloadData.type);
+                showLoader(false);
+            });
+
+
             // --- Real AI Image Editing (Image-to-Image) ---
             const editAIImage = async (file, prompt) => {
                 if (!checkApiKey()) return;
@@ -604,20 +858,13 @@
                     if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
                     
                     const candidate = result.candidates?.[0];
-                    if (!candidate) {
-                        console.error("API returned no response candidate:", result);
-                        throw new Error("The AI did not return a valid response.");
-                    }
+                    if (!candidate) throw new Error("The AI did not return a valid response.");
                     
                     const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
-
-                    if (blockReason) {
-                        const reasonText = result?.promptFeedback?.blockReason || 'Safety Filters';
-                        throw new Error(`Request blocked due to: ${reasonText}. Please adjust your prompt.`);
-                    }
+                    if (blockReason) throw new Error(`Request blocked due to: ${result?.promptFeedback?.blockReason || 'Safety Filters'}.`);
 
                     const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
-                    if (generatedPart && generatedPart.inlineData.data) {
+                    if (generatedPart?.inlineData?.data) {
                         const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
                         currentDownloadData = { type: 'image', content: imageUrl, title: 'edited-image' };
                         generatedImage.src = imageUrl;
@@ -625,16 +872,7 @@
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
                     } else {
-                         console.error("API Response without image:", result);
-                         let detailedError = "The AI could not edit the image. ";
-                         if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-                            detailedError += `(Reason: ${candidate.finishReason}). `;
-                         }
-                         if (candidate.content?.parts?.[0]?.text) {
-                            detailedError += "The model returned text instead of an image. This can happen with restrictive safety filters. Please try different instructions.";
-                         } else {
-                            detailedError += "The response did not contain image data. This might be due to safety filters. Please try different instructions.";
-                         }
+                         let detailedError = "The AI could not edit the image. This might be due to safety filters. Please try different instructions.";
                          throw new Error(detailedError);
                     }
                 } catch (error) {
@@ -680,25 +918,39 @@
                 
                 const zipBlob = await zip.generateAsync({ type: "blob" });
                 const url = URL.createObjectURL(zipBlob);
-                downloadBtn.href = url;
-                downloadBtn.click();
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.download = 'ai_article.zip';
+                tempLink.click();
                 URL.revokeObjectURL(url);
             };
 
-
             downloadBtn.addEventListener('click', (event) => {
+                event.preventDefault();
                 if (downloadBtn.classList.contains('cursor-not-allowed')) {
-                    event.preventDefault();
                     showError("errorPaymentTitle", "errorPaymentText");
                     return;
                 }
                 
-                if (currentDownloadData.type === 'article') {
-                    event.preventDefault(); // Prevent default link behavior
+                const isProtected = downloadBtn.dataset.protected === "true";
+                
+                if (currentDownloadData.type === 'article' && isProtected) {
+                    downloadProtectedArticleAsZip(currentDownloadData.title, currentDownloadData.content);
+                } else if (currentDownloadData.type === 'article') {
                     downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
+                } else if (currentDownloadData.type.includes('image') && isProtected){
+                    const tempLink = document.createElement('a');
+                    tempLink.href = currentDownloadData.protectedContent;
+                    tempLink.download = 'ai_protected_image.png';
+                    tempLink.click();
                 } else {
-                    downloadBtn.href = currentDownloadData.content;
+                    const tempLink = document.createElement('a');
+                    tempLink.href = currentDownloadData.content;
+                    tempLink.download = 'ai_generated_image.png';
+                    tempLink.click();
                 }
+                
+                downloadBtn.dataset.protected = "false";
             });
             
             // --- Image Upload & Preview Reset Logic ---
