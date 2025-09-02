@@ -687,8 +687,8 @@
                 showPaymentUI('translation');
             });
 
-            // --- DRM Protection Logic ---
-            const applyImageProtection = (imageUrl) => {
+            // --- Image Download Preparation (Protection Removed) ---
+            const prepareImageForDownload = (imageUrl) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
@@ -698,22 +698,14 @@
                         canvas.width = img.width;
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
-
-                        // Always apply screen recording protection simulation
-                        ctx.font = 'bold 48px Arial';
-                        ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-                        ctx.save();
-                        ctx.translate(canvas.width/2, canvas.height/2);
-                        ctx.rotate(-0.785); // 45 degrees
-                        ctx.textAlign = 'center';
-                        ctx.fillText('PROTECTED', 0, 0);
-                        ctx.restore();
+                        
+                        // Watermark logic has been removed.
                         
                         resolve(canvas.toDataURL('image/png'));
                     };
                     img.onerror = () => {
-                        showError("errorTitleDefault", "Failed to load image for protection.");
-                        resolve(null); // Resolve with null if image fails to load
+                        showError("errorTitleDefault", "Failed to load image for download.");
+                        resolve(null);
                     }
                     img.src = imageUrl;
                 });
@@ -776,9 +768,6 @@
                 const doc = new jsPDF();
                 const zip = new JSZip();
 
-                 // Add a font that supports Arabic, like "Amiri"
-                 // Note: jsPDF has limited support for RTL and Arabic characters without plugins or custom fonts.
-                 // This is a basic implementation. For perfect rendering, a library like jspdf-autotable with font support is needed.
                  doc.setFont('Helvetica'); // Fallback font
                  doc.setLanguage('ar');
                  
@@ -788,21 +777,7 @@
                  const pageWidth = doc.internal.pageSize.width;
                  let y = 15;
                  
-                 const addWatermark = (pdfDoc) => {
-                     const totalPages = pdfDoc.internal.getNumberOfPages();
-                     for (let i = 1; i <= totalPages; i++) {
-                         pdfDoc.setPage(i);
-                         pdfDoc.saveGraphicsState();
-                         pdfDoc.setFontSize(50);
-                         pdfDoc.setGState(new doc.GState({opacity: 0.3}));
-                         
-                         // Always apply screen recording protection simulation
-                         pdfDoc.setTextColor(255, 0, 0);
-                         pdfDoc.text('PROTECTED', pageWidth / 2, pageHeight / 1.8, { align: 'center', angle: 45 });
-                         
-                         pdfDoc.restoreGraphicsState();
-                     }
-                 };
+                 // Watermark function removed.
 
                  for(let i = 0; i < lines.length; i++) {
                     if (y > pageHeight - 20) {
@@ -814,16 +789,16 @@
                     y += 7;
                  }
                  
-                 addWatermark(doc);
+                 // Call to watermark function removed.
                 
                 const pdfBlob = doc.output('blob');
-                zip.file(`${title.replace(/ /g, "_")}_protected.pdf`, pdfBlob);
+                zip.file(`${title.replace(/ /g, "_")}.pdf`, pdfBlob);
                 
                 const zipBlob = await zip.generateAsync({ type: "blob" });
                 const url = URL.createObjectURL(zipBlob);
                 const tempLink = document.createElement('a');
                 tempLink.href = url;
-                tempLink.download = 'ai_protected_content.zip';
+                tempLink.download = 'ai_content.zip';
                 tempLink.click();
                 URL.revokeObjectURL(url);
             };
@@ -838,11 +813,11 @@
                 if (currentDownloadData.type === 'article' || currentDownloadData.type === 'translation') {
                     await downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
                 } else if (currentDownloadData.type.includes('image')){
-                    const protectedImageUrl = await applyImageProtection(currentDownloadData.content);
-                    if (protectedImageUrl) {
+                    const imageUrl = await prepareImageForDownload(currentDownloadData.content);
+                    if (imageUrl) {
                         const tempLink = document.createElement('a');
-                        tempLink.href = protectedImageUrl;
-                        tempLink.download = 'ai_protected_image.png';
+                        tempLink.href = imageUrl;
+                        tempLink.download = 'ai_image.png';
                         tempLink.click();
                     }
                 }
@@ -888,4 +863,3 @@
 
 </body>
 </html>
-
