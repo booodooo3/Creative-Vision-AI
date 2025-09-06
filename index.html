@@ -85,7 +85,7 @@
             direction: ltr;
         }
         /* Added to prevent text selection in article box */
-        #text-result-container {
+        #text-result-container, .no-screenshot {
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -94,6 +94,24 @@
         .lang-active {
             background-color: #3b82f6;
             color: white;
+        }
+        /* CSS to prevent printing */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            body::before {
+                content: "Printing and content capture are disabled on this page.";
+                visibility: visible;
+                display: block;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 20px;
+                color: #000;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -107,7 +125,7 @@
         </div>
     </div>
 
-    <div class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+    <div id="main-content-wrapper" class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
         <!-- Header -->
         <header class="text-center">
             <img src="https://intrigued-isabelle-4i.zipwp.link/wp-content/uploads/2025/09/Opera-Snapshot_2025-09-05_220207_index.html.png" alt="Creative Vision AI Title" class="mx-auto w-full max-w-md rounded-lg">
@@ -335,6 +353,7 @@
                     errorNoImage: 'Valid image data was not received from the API.',
                     errorNoText: 'Valid text was not received from the API. The response may have been blocked.',
                     errorApiKey: 'API Key is missing or invalid. Please check your key in the script.',
+                    errorScreenshotDisabled: "Screenshots are disabled for this content.",
                     copyright: `Copyright © ${new Date().getFullYear()} Creative Vision AI. All Rights Reserved.`,
                 },
                 ar: {
@@ -380,6 +399,7 @@
                     errorNoImage: 'لم يتم استلام بيانات صورة صالحة من الواجهة البرمجية.',
                     errorNoText: 'لم يتم استلام نص صالح من الواجهة البرمجية. قد يكون الرد محجوباً.',
                     errorApiKey: 'مفتاح API مفقود أو غير صالح. الرجاء التحقق من المفتاح في الشيفرة البرمجية.',
+                    errorScreenshotDisabled: "لقطات الشاشة معطلة لهذا المحتوى.",
                     copyright: `حقوق الطبع والنشر © ${new Date().getFullYear()} Creative Vision AI. جميع الحقوق محفوظة.`,
                 }
             };
@@ -435,6 +455,7 @@
             langBtnAr.addEventListener('click', () => setLanguage('ar'));
             
             // --- Element Selection ---
+            const mainContentWrapper = document.getElementById('main-content-wrapper');
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             
@@ -496,10 +517,20 @@
             const cancelGenerationBtn = document.getElementById('cancel-generation-btn');
             const cancelArticleBtn = document.getElementById('cancel-article-btn');
             
-            // --- Prevent Default Content Actions ---
-            imageResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
-            editImagePreviewContainer.addEventListener('contextmenu', (e) => e.preventDefault());
-            textResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            // --- Screenshot and Copy Protection ---
+            if(mainContentWrapper) {
+                mainContentWrapper.classList.add('no-screenshot');
+            }
+            // Disable right-click context menu globally
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            // Listen for key presses to deter screenshots
+            document.addEventListener('keyup', (e) => {
+                if (e.key === 'PrintScreen') {
+                    // This is not foolproof, but can deter some users.
+                    navigator.clipboard.writeText(''); // Attempt to clear clipboard
+                    showError("errorTitleDefault", "errorScreenshotDisabled");
+                }
+            });
             
             const checkApiKey = () => {
                 if (apiKey === "PASTE_YOUR_GOOGLE_AI_API_KEY_HERE" || !apiKey) {
@@ -1042,4 +1073,3 @@
 
 </body>
 </html>
-
