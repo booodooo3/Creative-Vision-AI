@@ -85,7 +85,7 @@
             direction: ltr;
         }
         /* Added to prevent text selection in article box */
-        #text-result-container, .no-screenshot {
+        #text-result-container {
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -94,24 +94,6 @@
         .lang-active {
             background-color: #3b82f6;
             color: white;
-        }
-        /* CSS to prevent printing */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            body::before {
-                content: "Printing and content capture are disabled on this page.";
-                visibility: visible;
-                display: block;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 20px;
-                color: #000;
-                text-align: center;
-            }
         }
     </style>
 </head>
@@ -125,7 +107,7 @@
         </div>
     </div>
 
-    <div id="main-content-wrapper" class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+    <div class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
         <!-- Header -->
         <header class="text-center">
             <img src="https://intrigued-isabelle-4i.zipwp.link/wp-content/uploads/2025/09/Opera-Snapshot_2025-09-05_220207_index.html.png" alt="Creative Vision AI Title" class="mx-auto w-full max-w-md rounded-lg">
@@ -144,7 +126,7 @@
         <div class="border-b border-slate-700">
             <nav class="-mb-px flex space-x-4 rtl:space-x-reverse overflow-x-auto pb-px" aria-label="Tabs">
                 <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
-                <button id="tab-faceswap" data-key="tabFaceSwap" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تركيب الوجوه</button>
+                <button id="tab-article" data-key="tabArticle" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">كاتب المقالات</button>
                 <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
                 <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
                 <button id="tab-merge" data-key="tabMerge" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">دمج الصور</button>
@@ -157,42 +139,9 @@
             <button id="generate-btn-text" data-key="generateBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">إنشاء صورة</button>
         </div>
 
-        <div id="tab-content-faceswap" class="tab-content hidden space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Source Face Upload -->
-                <div class="space-y-2">
-                    <label for="faceswap-image-upload-source" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                        <span data-key="uploadSourceFace"></span>
-                    </label>
-                    <input id="faceswap-image-upload-source" type="file" class="hidden" accept="image/*" />
-                    <div class="image-preview-container">
-                         <div id="faceswap-image-placeholder-source" class="text-center text-slate-400 p-4">
-                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                         </div>
-                         <img id="faceswap-image-preview-source" src="#" alt="Source face for swapping" class="preview-image hidden">
-                         <button id="cancel-preview-btn-faceswap-source" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         </button>
-                    </div>
-                </div>
-                 <!-- Target Image Upload -->
-                <div class="space-y-2">
-                    <label for="faceswap-image-upload-target" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                        <span data-key="uploadTargetImage"></span>
-                    </label>
-                    <input id="faceswap-image-upload-target" type="file" class="hidden" accept="image/*" />
-                     <div class="image-preview-container">
-                         <div id="faceswap-image-placeholder-target" class="text-center text-slate-400 p-4">
-                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                         </div>
-                         <img id="faceswap-image-preview-target" src="#" alt="Target image for swapping" class="preview-image hidden">
-                         <button id="cancel-preview-btn-faceswap-target" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         </button>
-                    </div>
-                </div>
-            </div>
-            <button id="generate-btn-faceswap" data-key="faceSwapBtn" class="generate-btn mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>بدء التركيب</button>
+        <div id="tab-content-article" class="tab-content hidden space-y-4">
+             <input type="text" id="article-title" data-key-placeholder="articleTitlePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="اكتب عنوان المقال هنا...">
+            <button id="generate-btn-article" data-key="writeArticleBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">اكتب المقال</button>
         </div>
 
         <div id="tab-content-aiedit" class="tab-content hidden space-y-4">
@@ -345,15 +294,14 @@
             const translations = {
                 en: {
                     tabText: 'Text to Image',
-                    tabFaceSwap: 'Face Swap',
+                    tabArticle: 'AI Article Writer',
                     tabAiEdit: 'AI Image Editing',
                     tabTranslate: 'Text Translation',
                     tabMerge: 'Image Merge',
                     textPlaceholder: 'Example: An astronaut riding a horse on Mars, cinematic style...',
                     generateBtn: 'Generate Image',
-                    uploadSourceFace: 'Upload Face (Source)',
-                    uploadTargetImage: 'Upload Image (Target)',
-                    faceSwapBtn: 'Start Swap',
+                    articleTitlePlaceholder: 'Enter the article title here...',
+                    writeArticleBtn: 'Write Article',
                     uploadForEditing: 'Upload an Image to Start Editing',
                     editPlaceholder: 'e.g., change hair color to blonde, add a hat...',
                     editBtn: 'Apply Edits',
@@ -376,7 +324,7 @@
                     errorTitleDefault: 'Operation Failed!',
                     errorInputTitle: 'Input Error',
                     errorInputText: 'Please enter a text prompt to generate the image.',
-                    errorInputFaceSwap: 'Please upload both a source face and a target image.',
+                    errorInputArticle: 'Please enter a title for the article.',
                     errorInputEdit: 'Please upload an image and provide an edit instruction.',
                     errorInputTranslate: 'Please enter text to translate.',
                     errorInputMerge: 'Please upload both images to merge them.',
@@ -387,20 +335,18 @@
                     errorNoImage: 'Valid image data was not received from the API.',
                     errorNoText: 'Valid text was not received from the API. The response may have been blocked.',
                     errorApiKey: 'API Key is missing or invalid. Please check your key in the script.',
-                    errorScreenshotDisabled: "Screenshots are disabled for this content.",
                     copyright: `Copyright © ${new Date().getFullYear()} Creative Vision AI. All Rights Reserved.`,
                 },
                 ar: {
                     tabText: 'نص إلى صورة',
-                    tabFaceSwap: 'تركيب الوجوه',
+                    tabArticle: 'كاتب المقالات',
                     tabAiEdit: 'تعديل الصور',
                     tabTranslate: 'ترجمة النصوص',
                     tabMerge: 'دمج الصور',
                     textPlaceholder: 'مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي...',
                     generateBtn: 'إنشاء صورة',
-                    uploadSourceFace: 'ارفع صورة الوجه (المصدر)',
-                    uploadTargetImage: 'ارفع الصورة (الهدف)',
-                    faceSwapBtn: 'بدء التركيب',
+                    articleTitlePlaceholder: 'اكتب عنوان المقال هنا...',
+                    writeArticleBtn: 'اكتب المقال',
                     uploadForEditing: 'ارفع صورة لبدء التعديل',
                     editPlaceholder: 'مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة...',
                     editBtn: 'تطبيق التعديلات',
@@ -423,7 +369,7 @@
                     errorTitleDefault: 'فشلت العملية!',
                     errorInputTitle: 'خطأ في الإدخال',
                     errorInputText: 'الرجاء إدخال وصف نصي لإنشاء الصورة.',
-                    errorInputFaceSwap: 'الرجاء رفع كلتا الصورتين لإتمام عملية التركيب.',
+                    errorInputArticle: 'الرجاء إدخال عنوان للمقال.',
                     errorInputEdit: 'الرجاء رفع صورة وتقديم تعليمات التعديل.',
                     errorInputTranslate: 'الرجاء إدخال نص للترجمة.',
                     errorInputMerge: 'الرجاء رفع كلتا الصورتين لدمجهما.',
@@ -434,7 +380,6 @@
                     errorNoImage: 'لم يتم استلام بيانات صورة صالحة من الواجهة البرمجية.',
                     errorNoText: 'لم يتم استلام نص صالح من الواجهة البرمجية. قد يكون الرد محجوباً.',
                     errorApiKey: 'مفتاح API مفقود أو غير صالح. الرجاء التحقق من المفتاح في الشيفرة البرمجية.',
-                    errorScreenshotDisabled: "لقطات الشاشة معطلة لهذا المحتوى.",
                     copyright: `حقوق الطبع والنشر © ${new Date().getFullYear()} Creative Vision AI. جميع الحقوق محفوظة.`,
                 }
             };
@@ -490,12 +435,13 @@
             langBtnAr.addEventListener('click', () => setLanguage('ar'));
             
             // --- Element Selection ---
-            const mainContentWrapper = document.getElementById('main-content-wrapper');
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             
             const textPrompt = document.getElementById('text-prompt');
             const generateBtnText = document.getElementById('generate-btn-text');
+            const articleTitle = document.getElementById('article-title');
+            const generateBtnArticle = document.getElementById('generate-btn-article');
             
             // Translation elements
             const generateBtnTranslate = document.getElementById('generate-btn-translate');
@@ -545,35 +491,15 @@
             let uploadedMergeFile1 = null;
             let uploadedMergeFile2 = null;
 
-            // AI Face Swap elements
-            const faceswapImageUploadSource = document.getElementById('faceswap-image-upload-source');
-            const faceswapImagePlaceholderSource = document.getElementById('faceswap-image-placeholder-source');
-            const faceswapImagePreviewSource = document.getElementById('faceswap-image-preview-source');
-            const cancelPreviewBtnFaceSwapSource = document.getElementById('cancel-preview-btn-faceswap-source');
-            const faceswapImageUploadTarget = document.getElementById('faceswap-image-upload-target');
-            const faceswapImagePlaceholderTarget = document.getElementById('faceswap-image-placeholder-target');
-            const faceswapImagePreviewTarget = document.getElementById('faceswap-image-preview-target');
-            const cancelPreviewBtnFaceSwapTarget = document.getElementById('cancel-preview-btn-faceswap-target');
-            const generateBtnFaceSwap = document.getElementById('generate-btn-faceswap');
-            let uploadedFaceSwapSource = null;
-            let uploadedFaceSwapTarget = null;
-
 
             // Result cancel buttons
             const cancelGenerationBtn = document.getElementById('cancel-generation-btn');
             const cancelArticleBtn = document.getElementById('cancel-article-btn');
             
-            // --- Screenshot and Copy Protection ---
-            if(mainContentWrapper) {
-                mainContentWrapper.classList.add('no-screenshot');
-            }
-            document.addEventListener('contextmenu', (e) => e.preventDefault());
-            document.addEventListener('keyup', (e) => {
-                if (e.key === 'PrintScreen') {
-                    navigator.clipboard.writeText('');
-                    showError("errorTitleDefault", "errorScreenshotDisabled");
-                }
-            });
+            // --- Prevent Default Content Actions ---
+            imageResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            editImagePreviewContainer.addEventListener('contextmenu', (e) => e.preventDefault());
+            textResultContainer.addEventListener('contextmenu', (e) => e.preventDefault());
             
             const checkApiKey = () => {
                 if (apiKey === "PASTE_YOUR_GOOGLE_AI_API_KEY_HERE" || !apiKey) {
@@ -605,7 +531,7 @@
 
             // --- UI Helper Functions ---
             const showLoader = (isLoading) => {
-                 const allGenerateBtns = [generateBtnText, generateBtnFaceSwap, generateBtnAiEdit, generateBtnTranslate, generateBtnMerge];
+                 const allGenerateBtns = [generateBtnText, generateBtnArticle, generateBtnAiEdit, generateBtnTranslate, generateBtnMerge];
                 if (isLoading) {
                     resultSection.classList.remove('hidden');
                     loader.classList.remove('hidden');
@@ -615,11 +541,13 @@
                     allGenerateBtns.forEach(btn => btn.disabled = true);
                 } else {
                     loader.classList.add('hidden');
+                    // Re-enable buttons based on their state
                     generateBtnText.disabled = false;
+                    generateBtnArticle.disabled = false;
                     generateBtnTranslate.disabled = false;
                     generateBtnAiEdit.disabled = !uploadedEditFile;
                     generateBtnMerge.disabled = !(uploadedMergeFile1 && uploadedMergeFile2);
-                    generateBtnFaceSwap.disabled = !(uploadedFaceSwapSource && uploadedFaceSwapTarget);
+
                 }
             };
             
@@ -651,7 +579,8 @@
                 
                 downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 
-                paypalButtonContainer.innerHTML = '';
+                // Render PayPal Button
+                paypalButtonContainer.innerHTML = ''; // Clear previous button
                 if (window.paypal) {
                     try {
                         paypal.Buttons({
@@ -660,6 +589,7 @@
                                     purchase_units: [{
                                         amount: { value: '1.00', currency_code: 'USD' }
                                     }],
+                                    // This setting hides the shipping address fields in the PayPal checkout.
                                     application_context: {
                                         shipping_preference: 'NO_SHIPPING'
                                     }
@@ -742,6 +672,41 @@
 
             generateBtnText.addEventListener('click', () => generateAIImage(textPrompt.value));
 
+            // --- Real AI Article Generation ---
+            const generateAIArticle = async (title) => {
+                if (!checkApiKey()) return;
+                if (!title.trim()) return showError("errorInputTitle", "errorInputArticle");
+                showLoader(true);
+                downloadTranslationBtn.classList.add('hidden');
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a professional article writer. Write a comprehensive article about the given title. The article should be well-structured with an introduction, body, and conclusion. Use clear and informative language.";
+                const payload = { contents: [{ parts: [{ text: `Write an article about: "${title}"` }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+                    
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        currentDownloadData = { type: 'article', content: text, title };
+                        articleContent.textContent = text;
+                        imageResultContainer.classList.add('hidden');
+                        textResultContainer.classList.remove('hidden');
+                        showPaymentUI('article');
+                    } else {
+                        throw new Error(translations[currentLang].errorNoText);
+                    }
+                } catch (error) {
+                    console.error("AI Article Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            generateBtnArticle.addEventListener('click', () => generateAIArticle(articleTitle.value));
+
             // --- AI Text Translation ---
             const translateText = async (text, source, target) => {
                 if (!checkApiKey()) return;
@@ -774,7 +739,7 @@
                         imageResultContainer.classList.add('hidden');
                         textResultContainer.classList.remove('hidden');
                         downloadTranslationBtn.classList.remove('hidden');
-                        paymentSection.classList.add('hidden');
+                        paymentSection.classList.add('hidden'); // Hide payment until download icon is clicked
                     } else {
                         throw new Error(translations[currentLang].errorNoText);
                     }
@@ -803,6 +768,9 @@
                         canvas.width = img.width;
                         canvas.height = img.height;
                         ctx.drawImage(img, 0, 0);
+                        
+                        // Watermark logic has been removed.
+                        
                         resolve(canvas.toDataURL('image/png'));
                     };
                     img.onerror = () => {
@@ -911,62 +879,6 @@
             };
             generateBtnMerge.addEventListener('click', () => mergeAIImages(uploadedMergeFile1, uploadedMergeFile2, mergePrompt.value));
 
-            // --- Real AI Face Swap ---
-            const generateFaceSwap = async (fileSource, fileTarget) => {
-                if (!checkApiKey()) return;
-                if (!fileSource || !fileTarget) return showError("errorInputTitle", "errorInputFaceSwap");
-                showLoader(true);
-                downloadTranslationBtn.classList.add('hidden');
-                try {
-                    const base64DataSource = await fileToBase64(fileSource);
-                    const base64DataTarget = await fileToBase64(fileTarget);
-
-                    const userPrompt = "Take the face from the first image and realistically place it onto the head of the person in the second image. Maintain the lighting, angle, and style of the second image for a seamless blend.";
-
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-                    const payload = { 
-                        contents: [{ 
-                            parts: [
-                                { text: userPrompt }, 
-                                { inlineData: { mimeType: fileSource.type, data: base64DataSource } },
-                                { inlineData: { mimeType: fileTarget.type, data: base64DataTarget } }
-                            ] 
-                        }], 
-                        generationConfig: { responseModalities: ['IMAGE'] } 
-                    };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
-                    
-                    const candidate = result.candidates?.[0];
-                    if (!candidate) throw new Error("The AI did not return a valid response.");
-                    
-                    const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
-                    if (blockReason) throw new Error(`Request blocked due to: ${result?.promptFeedback?.blockReason || 'Safety Filters'}.`);
-
-                    const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
-                    if (generatedPart?.inlineData?.data) {
-                        const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
-                        currentDownloadData = { type: 'image', content: imageUrl, title: 'face-swap-result' };
-                        generatedImage.src = imageUrl;
-                        textResultContainer.classList.add('hidden');
-                        imageResultContainer.classList.remove('hidden');
-                        showPaymentUI('image');
-                    } else {
-                         let detailedError = "The AI could not perform the face swap. This might be due to safety filters. Please try different images.";
-                         throw new Error(detailedError);
-                    }
-                } catch (error) {
-                    console.error("AI Face Swap Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
-                } finally {
-                    showLoader(false);
-                }
-            };
-            generateBtnFaceSwap.addEventListener('click', () => generateFaceSwap(uploadedFaceSwapSource, uploadedFaceSwapTarget));
-
-
             // --- Result Cancellation Logic ---
             const cancelResult = () => {
                 resultSection.classList.add('hidden');
@@ -981,22 +893,28 @@
                 const doc = new jsPDF();
                 const zip = new JSZip();
 
-                 doc.setFont('Helvetica'); 
+                 doc.setFont('Helvetica'); // Fallback font
                  doc.setLanguage('ar');
                  
                  const lines = doc.splitTextToSize(content, 180);
+
                  const pageHeight = doc.internal.pageSize.height;
                  const pageWidth = doc.internal.pageSize.width;
                  let y = 15;
+                 
+                 // Watermark function removed.
 
                  for(let i = 0; i < lines.length; i++) {
                     if (y > pageHeight - 20) {
                         doc.addPage();
                         y = 15;
                     }
+                    // Writing text from right to left
                     doc.text(lines[i], pageWidth - 15, y, { align: 'right' });
                     y += 7;
                  }
+                 
+                 // Call to watermark function removed.
                 
                 const pdfBlob = doc.output('blob');
                 zip.file(`${title.replace(/ /g, "_")}.pdf`, pdfBlob);
@@ -1017,7 +935,7 @@
                     return;
                 }
                 
-                if (currentDownloadData.type === 'translation') {
+                if (currentDownloadData.type === 'article' || currentDownloadData.type === 'translation') {
                     await downloadArticleAsZip(currentDownloadData.title, currentDownloadData.content);
                 } else if (currentDownloadData.type.includes('image')){
                     const imageUrl = await prepareImageForDownload(currentDownloadData.content);
@@ -1065,31 +983,9 @@
                 generateBtnMerge.disabled = true;
             };
             cancelPreviewBtnMerge2.addEventListener('click', resetMergePreview2);
-            
-            const resetFaceSwapPreviewSource = () => {
-                uploadedFaceSwapSource = null;
-                faceswapImageUploadSource.value = null;
-                faceswapImagePreviewSource.src = '#';
-                faceswapImagePreviewSource.classList.add('hidden');
-                cancelPreviewBtnFaceSwapSource.classList.add('hidden');
-                faceswapImagePlaceholderSource.classList.remove('hidden');
-                generateBtnFaceSwap.disabled = true;
-            };
-            cancelPreviewBtnFaceSwapSource.addEventListener('click', resetFaceSwapPreviewSource);
-
-            const resetFaceSwapPreviewTarget = () => {
-                uploadedFaceSwapTarget = null;
-                faceswapImageUploadTarget.value = null;
-                faceswapImagePreviewTarget.src = '#';
-                faceswapImagePreviewTarget.classList.add('hidden');
-                cancelPreviewBtnFaceSwapTarget.classList.add('hidden');
-                faceswapImagePlaceholderTarget.classList.remove('hidden');
-                generateBtnFaceSwap.disabled = true;
-            };
-            cancelPreviewBtnFaceSwapTarget.addEventListener('click', resetFaceSwapPreviewTarget);
 
 
-            // --- Image Upload Handlers ---
+            // --- Image Upload Logic (for AI Edit tab) ---
             editImageUpload.addEventListener('change', (e) => {
                 if (e.target.files && e.target.files[0]) {
                     uploadedEditFile = e.target.files[0];
@@ -1108,6 +1004,7 @@
                 }
             });
 
+            // --- Image Upload Logic (for AI Merge tab) ---
              const handleMergeImageUpload = (e, fileNumber) => {
                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
@@ -1136,34 +1033,6 @@
 
             mergeImageUpload1.addEventListener('change', (e) => handleMergeImageUpload(e, 1));
             mergeImageUpload2.addEventListener('change', (e) => handleMergeImageUpload(e, 2));
-
-             const handleFaceSwapImageUpload = (e, type) => {
-                if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        if (type === 'source') {
-                            uploadedFaceSwapSource = file;
-                            faceswapImagePlaceholderSource.classList.add('hidden');
-                            faceswapImagePreviewSource.src = event.target.result;
-                            faceswapImagePreviewSource.classList.remove('hidden');
-                            cancelPreviewBtnFaceSwapSource.classList.remove('hidden');
-                        } else {
-                            uploadedFaceSwapTarget = file;
-                            faceswapImagePlaceholderTarget.classList.add('hidden');
-                            faceswapImagePreviewTarget.src = event.target.result;
-                            faceswapImagePreviewTarget.classList.remove('hidden');
-                            cancelPreviewBtnFaceSwapTarget.classList.remove('hidden');
-                        }
-                        if (uploadedFaceSwapSource && uploadedFaceSwapTarget) {
-                            generateBtnFaceSwap.disabled = false;
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            faceswapImageUploadSource.addEventListener('change', (e) => handleFaceSwapImageUpload(e, 'source'));
-            faceswapImageUploadTarget.addEventListener('change', (e) => handleFaceSwapImageUpload(e, 'target'));
 
 
             // --- Initial Load ---
