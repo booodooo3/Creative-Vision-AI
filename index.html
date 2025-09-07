@@ -168,7 +168,7 @@
         <div class="border-b border-slate-700">
             <nav class="-mb-px flex space-x-4 rtl:space-x-reverse overflow-x-auto pb-px" aria-label="Tabs">
                 <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
-                <button id="tab-faceswap" data-key="tabFaceSwap" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تركيب الوجوه</button>
+                <button id="tab-legal" data-key="tabLegal" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">الباحث القانوني</button>
                 <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
                 <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
                 <button id="tab-merge" data-key="tabMerge" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">دمج الصور</button>
@@ -181,45 +181,9 @@
             <button id="generate-btn-text" data-key="generateBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">إنشاء صورة</button>
         </div>
 
-        <div id="tab-content-faceswap" class="tab-content hidden space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Source Face Upload -->
-                <div class="space-y-2">
-                    <label for="faceswap-image-upload-source" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                        <span data-key="uploadSourceFace"></span>
-                    </label>
-                    <input id="faceswap-image-upload-source" type="file" class="hidden" accept="image/*" />
-                    <div class="image-preview-container">
-                         <div class="watermark-overlay"></div>
-                         <div id="faceswap-image-placeholder-source" class="text-center text-slate-400 p-4">
-                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                         </div>
-                         <img id="faceswap-image-preview-source" src="#" alt="Source face for swapping" class="preview-image hidden">
-                         <button id="cancel-preview-btn-faceswap-source" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         </button>
-                    </div>
-                </div>
-                 <!-- Target Image Upload -->
-                <div class="space-y-2">
-                    <label for="faceswap-image-upload-target" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                        <span data-key="uploadTargetImage"></span>
-                    </label>
-                    <input id="faceswap-image-upload-target" type="file" class="hidden" accept="image/*" />
-                     <div class="image-preview-container">
-                         <div class="watermark-overlay"></div>
-                         <div id="faceswap-image-placeholder-target" class="text-center text-slate-400 p-4">
-                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                         </div>
-                         <img id="faceswap-image-preview-target" src="#" alt="Target image for swapping" class="preview-image hidden">
-                         <button id="cancel-preview-btn-faceswap-target" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         </button>
-                    </div>
-                </div>
-            </div>
-            <p class="text-xs text-center text-slate-400 px-4" data-key="faceSwapInstructions"></p>
-            <button id="generate-btn-faceswap" data-key="faceSwapBtn" class="generate-btn mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>بدء التركيب</button>
+        <div id="tab-content-legal" class="tab-content hidden space-y-4">
+            <input type="text" id="legal-query" data-key-placeholder="legalQueryPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: قانون التجارة في دولة الكويت...">
+            <button id="generate-btn-legal" data-key="searchBtn" class="generate-btn w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">بحث</button>
         </div>
 
         <div id="tab-content-aiedit" class="tab-content hidden space-y-4">
@@ -330,15 +294,19 @@
                 <img id="generated-image" class="w-full rounded-lg" alt="">
                 <div class="absolute top-0 left-0 w-full h-full z-10"></div>
             </div>
-            <!-- Article/Translation Result -->
+            <!-- Text/Legal Result -->
             <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
                 <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer">
                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
-                <button id="download-translation-btn" data-key-title="downloadTranslation" class="absolute top-2 right-12 rtl:right-auto rtl:left-12 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer hidden">
+                <button id="download-text-btn" data-key-title="downloadText" class="absolute top-2 right-12 rtl:right-auto rtl:left-12 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer hidden">
                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 </button>
                 <div id="article-content" class="result-text-container"></div>
+                <div id="sources-container" class="mt-4 pt-4 border-t border-slate-700 hidden">
+                    <h4 class="font-bold mb-2" data-key="legalSourcesTitle"></h4>
+                    <ul id="sources-list" class="list-disc list-inside text-sm space-y-1 text-left"></ul>
+                </div>
             </div>
             <!-- Payment & Download Section -->
             <div id="payment-section" class="text-center hidden w-full max-w-md space-y-3">
@@ -376,16 +344,14 @@
             const translations = {
                 en: {
                     tabText: 'Text to Image',
-                    tabFaceSwap: 'Face Swap',
+                    tabLegal: 'Legal AI Researcher',
                     tabAiEdit: 'AI Image Editing',
                     tabTranslate: 'Text Translation',
                     tabMerge: 'Image Merge',
                     textPlaceholder: 'Example: An astronaut riding a horse on Mars, cinematic style...',
                     generateBtn: 'Generate Image',
-                    uploadSourceFace: 'Upload Face (Source)',
-                    uploadTargetImage: 'Upload Image (Target)',
-                    faceSwapBtn: 'Execute Photorealistic Swap',
-                    faceSwapInstructions: 'For best results, use clear, front-facing photos with similar lighting conditions.',
+                    legalQueryPlaceholder: 'Example: Kuwaiti Commercial Law...',
+                    searchBtn: 'Search',
                     uploadForEditing: 'Upload an Image to Start Editing',
                     editPlaceholder: 'e.g., change hair color to blonde, add a hat...',
                     editBtn: 'Apply Edits',
@@ -397,7 +363,7 @@
                     uploadForMerge2: 'Upload Image 2',
                     mergePlaceholder: 'Optional: Describe how to merge the images...',
                     mergeBtn: 'Merge Images',
-                    downloadTranslation: 'Download translation (payment required)',
+                    downloadText: 'Download (payment required)',
                     imagePreviewPlaceholder: 'Image Preview',
                     loaderText: 'The AI is creating your content... This might take a moment.',
                     generatedImageAlt: 'AI Generated Image',
@@ -408,7 +374,7 @@
                     errorTitleDefault: 'Operation Failed!',
                     errorInputTitle: 'Input Error',
                     errorInputText: 'Please enter a text prompt to generate the image.',
-                    errorInputFaceSwap: 'Please upload both a source face and a target image.',
+                    errorInputLegal: 'Please enter a law and country to search for.',
                     errorInputEdit: 'Please upload an image and provide an edit instruction.',
                     errorInputTranslate: 'Please enter text to translate.',
                     errorInputMerge: 'Please upload both images to merge them.',
@@ -421,19 +387,18 @@
                     errorApiKey: 'API Key is missing or invalid. Please check your key in the script.',
                     errorScreenshotDisabled: "Screenshots are disabled for this content.",
                     copyright: `Copyright © ${new Date().getFullYear()} Creative Vision AI. All Rights Reserved.`,
+                    legalSourcesTitle: 'Sources:',
                 },
                 ar: {
                     tabText: 'نص إلى صورة',
-                    tabFaceSwap: 'تركيب الوجوه',
+                    tabLegal: 'الباحث القانوني',
                     tabAiEdit: 'تعديل الصور',
                     tabTranslate: 'ترجمة النصوص',
                     tabMerge: 'دمج الصور',
                     textPlaceholder: 'مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي...',
                     generateBtn: 'إنشاء صورة',
-                    uploadSourceFace: 'ارفع صورة الوجه (المصدر)',
-                    uploadTargetImage: 'ارفع الصورة (الهدف)',
-                    faceSwapBtn: 'تنفيذ تركيب احترافي',
-                    faceSwapInstructions: 'لأفضل النتائج، استخدم صورًا واضحة للوجه وبإضاءة متشابهة.',
+                    legalQueryPlaceholder: 'مثال: قانون التجارة في دولة الكويت...',
+                    searchBtn: 'بحث',
                     uploadForEditing: 'ارفع صورة لبدء التعديل',
                     editPlaceholder: 'مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة...',
                     editBtn: 'تطبيق التعديلات',
@@ -445,7 +410,7 @@
                     uploadForMerge2: 'ارفع الصورة الثانية',
                     mergePlaceholder: 'وصف اختياري: ادمج الصورتين مع التركيز على...',
                     mergeBtn: 'دمج الصورتين',
-                    downloadTranslation: 'تنزيل الترجمة (الدفع مطلوب)',
+                    downloadText: 'تنزيل (الدفع مطلوب)',
                     imagePreviewPlaceholder: 'معاينة الصورة',
                     loaderText: 'الذكاء الاصطناعي يقوم بإنشاء المحتوى الخاص بك... قد يستغرق هذا بعض الوقت.',
                     generatedImageAlt: 'صورة من إنشاء الذكاء الاصطناعي',
@@ -456,7 +421,7 @@
                     errorTitleDefault: 'فشلت العملية!',
                     errorInputTitle: 'خطأ في الإدخال',
                     errorInputText: 'الرجاء إدخال وصف نصي لإنشاء الصورة.',
-                    errorInputFaceSwap: 'الرجاء رفع كلتا الصورتين لإتمام عملية التركيب.',
+                    errorInputLegal: 'الرجاء إدخال اسم القانون والدولة للبحث.',
                     errorInputEdit: 'الرجاء رفع صورة وتقديم تعليمات التعديل.',
                     errorInputTranslate: 'الرجاء إدخال نص للترجمة.',
                     errorInputMerge: 'الرجاء رفع كلتا الصورتين لدمجهما.',
@@ -469,6 +434,7 @@
                     errorApiKey: 'مفتاح API مفقود أو غير صالح. الرجاء التحقق من المفتاح في الشيفرة البرمجية.',
                     errorScreenshotDisabled: "لقطات الشاشة معطلة لهذا المحتوى.",
                     copyright: `حقوق الطبع والنشر © ${new Date().getFullYear()} Creative Vision AI. جميع الحقوق محفوظة.`,
+                    legalSourcesTitle: 'المصادر:',
                 }
             };
 
@@ -513,7 +479,6 @@
                 langBtnEn.classList.toggle('lang-active', lang === 'en');
                 langBtnAr.classList.toggle('lang-active', lang === 'ar');
 
-                // Update UI texts if payment section is visible
                 if (!paymentSection.classList.contains('hidden')) {
                      resetPaymentUI();
                 }
@@ -529,19 +494,22 @@
             
             const textPrompt = document.getElementById('text-prompt');
             const generateBtnText = document.getElementById('generate-btn-text');
+            const legalQuery = document.getElementById('legal-query');
+            const generateBtnLegal = document.getElementById('generate-btn-legal');
             
-            // Translation elements
             const generateBtnTranslate = document.getElementById('generate-btn-translate');
             const translateInput = document.getElementById('translate-input');
             const sourceLang = document.getElementById('source-lang');
             const targetLang = document.getElementById('target-lang');
-            const downloadTranslationBtn = document.getElementById('download-translation-btn');
+            const downloadTextBtn = document.getElementById('download-text-btn');
 
             const resultSection = document.getElementById('result-section');
             const loader = document.getElementById('loader');
             const imageResultContainer = document.getElementById('image-result-container');
             const textResultContainer = document.getElementById('text-result-container');
             const articleContent = document.getElementById('article-content');
+            const sourcesContainer = document.getElementById('sources-container');
+            const sourcesList = document.getElementById('sources-list');
             const generatedImage = document.getElementById('generated-image');
 
             const paymentSection = document.getElementById('payment-section');
@@ -554,49 +522,24 @@
             const errorText = document.getElementById('error-text');
             const errorTitle = document.getElementById('error-title');
             
-            // AI Edit elements
             const editImageUpload = document.getElementById('edit-image-upload');
-            const editImagePreviewContainer = document.getElementById('edit-image-preview-container');
-            const editImagePlaceholder = document.getElementById('edit-image-placeholder');
             const editImagePreview = document.getElementById('edit-image-preview');
             const editPrompt = document.getElementById('edit-prompt');
             const generateBtnAiEdit = document.getElementById('generate-btn-aiedit');
-            const cancelPreviewBtn = document.getElementById('cancel-preview-btn');
             let uploadedEditFile = null;
 
-            // AI Merge elements
             const mergeImageUpload1 = document.getElementById('merge-image-upload-1');
-            const mergeImagePlaceholder1 = document.getElementById('merge-image-placeholder-1');
             const mergeImagePreview1 = document.getElementById('merge-image-preview-1');
-            const cancelPreviewBtnMerge1 = document.getElementById('cancel-preview-btn-merge-1');
             const mergeImageUpload2 = document.getElementById('merge-image-upload-2');
-            const mergeImagePlaceholder2 = document.getElementById('merge-image-placeholder-2');
             const mergeImagePreview2 = document.getElementById('merge-image-preview-2');
-            const cancelPreviewBtnMerge2 = document.getElementById('cancel-preview-btn-merge-2');
             const mergePrompt = document.getElementById('merge-prompt');
             const generateBtnMerge = document.getElementById('generate-btn-merge');
             let uploadedMergeFile1 = null;
             let uploadedMergeFile2 = null;
 
-            // AI Face Swap elements
-            const faceswapImageUploadSource = document.getElementById('faceswap-image-upload-source');
-            const faceswapImagePlaceholderSource = document.getElementById('faceswap-image-placeholder-source');
-            const faceswapImagePreviewSource = document.getElementById('faceswap-image-preview-source');
-            const cancelPreviewBtnFaceSwapSource = document.getElementById('cancel-preview-btn-faceswap-source');
-            const faceswapImageUploadTarget = document.getElementById('faceswap-image-upload-target');
-            const faceswapImagePlaceholderTarget = document.getElementById('faceswap-image-placeholder-target');
-            const faceswapImagePreviewTarget = document.getElementById('faceswap-image-preview-target');
-            const cancelPreviewBtnFaceSwapTarget = document.getElementById('cancel-preview-btn-faceswap-target');
-            const generateBtnFaceSwap = document.getElementById('generate-btn-faceswap');
-            let uploadedFaceSwapSource = null;
-            let uploadedFaceSwapTarget = null;
-
-
-            // Result cancel buttons
             const cancelGenerationBtn = document.getElementById('cancel-generation-btn');
             const cancelArticleBtn = document.getElementById('cancel-article-btn');
             
-            // --- Screenshot and Copy Protection ---
             if(mainContentWrapper) {
                 mainContentWrapper.classList.add('no-screenshot');
             }
@@ -616,29 +559,20 @@
                 return true;
             };
             
-            // --- Tab Switching Logic ---
             tabs.forEach(clickedTab => {
                 clickedTab.addEventListener('click', () => {
                     tabs.forEach(tab => {
                         const isClicked = tab === clickedTab;
                         tab.classList.toggle('tab-active', isClicked);
                         tab.classList.toggle('border-transparent', !isClicked);
-                        tab.classList.toggle('text-gray-400', !isClicked);
-                        tab.classList.toggle('hover:text-gray-200', !isClicked);
-                        tab.classList.toggle('hover:border-gray-500', !isClicked);
                         const contentId = `tab-content-${tab.id.split('-')[1]}`;
-                        const content = document.getElementById(contentId);
-                        if (content) {
-                            content.classList.toggle('hidden', !isClicked);
-                        }
+                        document.getElementById(contentId)?.classList.toggle('hidden', !isClicked);
                     });
                 });
             });
 
-
-            // --- UI Helper Functions ---
             const showLoader = (isLoading) => {
-                 const allGenerateBtns = [generateBtnText, generateBtnFaceSwap, generateBtnAiEdit, generateBtnTranslate, generateBtnMerge];
+                 const allGenerateBtns = [generateBtnText, generateBtnLegal, generateBtnAiEdit, generateBtnTranslate, generateBtnMerge];
                 if (isLoading) {
                     resultSection.classList.remove('hidden');
                     loader.classList.remove('hidden');
@@ -648,11 +582,7 @@
                     allGenerateBtns.forEach(btn => btn.disabled = true);
                 } else {
                     loader.classList.add('hidden');
-                    generateBtnText.disabled = false;
-                    generateBtnTranslate.disabled = false;
-                    generateBtnAiEdit.disabled = !uploadedEditFile;
-                    generateBtnMerge.disabled = !(uploadedMergeFile1 && uploadedMergeFile2);
-                    generateBtnFaceSwap.disabled = !(uploadedFaceSwapSource && uploadedFaceSwapTarget);
+                    allGenerateBtns.forEach(btn => btn.disabled = false); // Simplified re-enabling
                 }
             };
             
@@ -660,9 +590,9 @@
                 const translation = translations[currentLang];
                 errorTitle.textContent = translation[titleKey] || translation['errorTitleDefault'];
                 let message = translation[messageKey] || messageKey;
-                for (const key in replacements) {
+                Object.keys(replacements).forEach(key => {
                     message = message.replace(`{${key}}`, replacements[key]);
-                }
+                });
                 errorText.textContent = message;
                 errorBox.style.display = 'flex';
                 setTimeout(() => { errorBox.style.display = 'none'; }, 6000);
@@ -676,11 +606,7 @@
                 paypalButtonContainer.classList.remove('hidden');
                 paymentInstruction.classList.remove('hidden');
 
-                if (currentDownloadData.type === 'article' || currentDownloadData.type === 'translation') {
-                    if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnZip;
-                } else {
-                    if(downloadBtnSpan) downloadBtnSpan.textContent = translation.downloadBtnImage;
-                }
+                downloadBtnSpan.textContent = (currentDownloadData.type === 'image') ? translation.downloadBtnImage : translation.downloadBtnZip;
                 
                 downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 
@@ -688,25 +614,17 @@
                 if (window.paypal) {
                     try {
                         paypal.Buttons({
-                            createOrder: function(data, actions) {
-                                return actions.order.create({
-                                    purchase_units: [{
-                                        amount: { value: '1.00', currency_code: 'USD' }
-                                    }],
-                                    application_context: {
-                                        shipping_preference: 'NO_SHIPPING'
-                                    }
-                                });
-                            },
-                            onApprove: function(data, actions) {
-                                return actions.order.capture().then(function(details) {
-                                    paymentMessage.classList.remove('hidden');
-                                    paypalButtonContainer.classList.add('hidden');
-                                    paymentInstruction.classList.add('hidden');
-                                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                                });
-                            },
-                            onError: function (err) {
+                            createOrder: (data, actions) => actions.order.create({
+                                purchase_units: [{ amount: { value: '1.00', currency_code: 'USD' } }],
+                                application_context: { shipping_preference: 'NO_SHIPPING' }
+                            }),
+                            onApprove: (data, actions) => actions.order.capture().then(details => {
+                                paymentMessage.classList.remove('hidden');
+                                paypalButtonContainer.classList.add('hidden');
+                                paymentInstruction.classList.add('hidden');
+                                downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            }),
+                            onError: err => {
                                 console.error('PayPal Error:', err);
                                 showError("errorTitleDefault", "An error occurred with the payment process. Please try again.");
                             }
@@ -723,12 +641,7 @@
             const showPaymentUI = (type) => {
                 paymentSection.classList.remove('hidden');
                 downloadBtn.classList.remove('hidden'); 
-                
-                if (type === 'article' || type === 'translation') {
-                    downloadBtn.download = 'ai_content.zip';
-                } else {
-                    downloadBtn.download = 'ai_generated_image.png';
-                }
+                downloadBtn.download = type === 'image' ? 'ai_generated_image.png' : 'ai_content.zip';
                 resetPaymentUI();
             };
 
@@ -741,10 +654,10 @@
 
             // --- Real AI Image Generation (Text-to-Image) ---
             const generateAIImage = async (prompt) => {
-                if (!checkApiKey()) return;
-                if (!prompt.trim()) return showError("errorInputTitle", "errorInputText");
+                if (!checkApiKey() || !prompt.trim()) return showError("errorInputTitle", "errorInputText");
                 showLoader(true);
-                downloadTranslationBtn.classList.add('hidden');
+                downloadTextBtn.classList.add('hidden');
+                sourcesContainer.classList.add('hidden');
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
                 const payload = { instances: [{ prompt }], parameters: { "sampleCount": 1 } };
 
@@ -753,7 +666,7 @@
                     const result = await response.json();
                     if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
                     
-                    if (result.predictions && result.predictions[0]?.bytesBase64Encoded) {
+                    if (result.predictions?.[0]?.bytesBase64Encoded) {
                         const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
                         currentDownloadData = { type: 'image', content: imageUrl, title: prompt.substring(0, 20) };
                         generatedImage.src = imageUrl;
@@ -761,8 +674,7 @@
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
                     } else {
-                        console.error("API Response without image:", result);
-                        throw new Error("The AI could not generate an image for this prompt. It might be due to safety filters. Please try a different prompt.");
+                        throw new Error("The AI could not generate an image for this prompt due to safety filters. Please try a different prompt.");
                     }
                 } catch (error) {
                     console.error("AI Generation Error:", error);
@@ -772,14 +684,71 @@
                     showLoader(false);
                 }
             };
-
             generateBtnText.addEventListener('click', () => generateAIImage(textPrompt.value));
+
+            // --- AI Legal Research ---
+            const searchForLaw = async (query) => {
+                if (!checkApiKey() || !query.trim()) return showError("errorInputTitle", "errorInputLegal");
+                showLoader(true);
+                downloadTextBtn.classList.add('hidden');
+                sourcesContainer.classList.add('hidden');
+                sourcesList.innerHTML = '';
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a professional legal assistant. Your task is to find official laws and legal articles based on the user's query. Use the search tool to find the most accurate and up-to-date information from official government or legal sources. Provide a clear summary of the law, and you MUST cite your sources.";
+                const payload = {
+                    contents: [{ parts: [{ text: query }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
+
+                    const candidate = result.candidates?.[0];
+                    const text = candidate?.content?.parts?.[0]?.text;
+                    if (text) {
+                        let fullContent = text;
+                        articleContent.textContent = text;
+                        
+                        const groundingMetadata = candidate.groundingMetadata;
+                        if (groundingMetadata?.groundingAttributions?.length > 0) {
+                            fullContent += `\n\n---\n${translations[currentLang].legalSourcesTitle}\n`;
+                            sourcesContainer.classList.remove('hidden');
+                            groundingMetadata.groundingAttributions.forEach(att => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<a href="${att.web.uri}" target="_blank" class="text-blue-400 hover:underline">${att.web.title}</a>`;
+                                sourcesList.appendChild(li);
+                                fullContent += `\n- ${att.web.title}: ${att.web.uri}`;
+                            });
+                        }
+                        
+                        currentDownloadData = { type: 'legal', content: fullContent, title: query.substring(0, 30) };
+                        imageResultContainer.classList.add('hidden');
+                        textResultContainer.classList.remove('hidden');
+                        downloadTextBtn.classList.remove('hidden');
+                        paymentSection.classList.add('hidden');
+                    } else {
+                        throw new Error(translations[currentLang].errorNoText);
+                    }
+                } catch (error) {
+                    console.error("AI Legal Search Error:", error);
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                    resultSection.classList.add('hidden');
+                } finally {
+                    showLoader(false);
+                }
+            };
+            generateBtnLegal.addEventListener('click', () => searchForLaw(legalQuery.value));
 
             // --- AI Text Translation ---
             const translateText = async (text, source, target) => {
-                if (!checkApiKey()) return;
-                if (!text.trim()) return showError("errorInputTitle", "errorInputTranslate");
+                if (!checkApiKey() || !text.trim()) return showError("errorInputTitle", "errorInputTranslate");
                 showLoader(true);
+                downloadTextBtn.classList.add('hidden');
+                sourcesContainer.classList.add('hidden');
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 const systemPrompt = `You are an expert multilingual translator. Translate the user's text accurately from the source language to the target language. Provide only the translated text as the output, with no additional commentary or explanations.`;
                 const userPrompt = `Translate the following text from ${source} to ${target}:\n\n"${text}"`;
@@ -796,17 +765,11 @@
                         articleContent.textContent = translatedText;
                         
                         const rtlLangs = ['Arabic', 'Hebrew', 'Aramaic', 'Syriac'];
-                        if (rtlLangs.includes(target)) {
-                            articleContent.parentElement.dir = 'rtl';
-                            articleContent.style.textAlign = 'right';
-                        } else {
-                            articleContent.parentElement.dir = 'ltr';
-                            articleContent.style.textAlign = 'left';
-                        }
+                        textResultContainer.dir = rtlLangs.includes(target) ? 'rtl' : 'ltr';
 
                         imageResultContainer.classList.add('hidden');
                         textResultContainer.classList.remove('hidden');
-                        downloadTranslationBtn.classList.remove('hidden');
+                        downloadTextBtn.classList.remove('hidden');
                         paymentSection.classList.add('hidden');
                     } else {
                         throw new Error(translations[currentLang].errorNoText);
@@ -821,38 +784,32 @@
             };
             generateBtnTranslate.addEventListener('click', () => translateText(translateInput.value, sourceLang.value, targetLang.value));
             
-            downloadTranslationBtn.addEventListener('click', () => {
-                showPaymentUI('translation');
+            downloadTextBtn.addEventListener('click', () => {
+                showPaymentUI('text');
             });
 
-            // --- Image Download Preparation (Protection Removed) ---
-            const prepareImageForDownload = (imageUrl) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        resolve(canvas.toDataURL('image/png'));
-                    };
-                    img.onerror = () => {
-                        showError("errorTitleDefault", "Failed to load image for download.");
-                        resolve(null);
-                    }
-                    img.src = imageUrl;
-                });
-            };
+            const prepareImageForDownload = (imageUrl) => new Promise(resolve => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => {
+                    showError("errorTitleDefault", "Failed to load image for download.");
+                    resolve(null);
+                }
+                img.src = imageUrl;
+            });
 
-
-            // --- Real AI Image Editing (Image-to-Image) ---
             const editAIImage = async (file, prompt) => {
-                if (!checkApiKey()) return;
-                if (!file || !prompt.trim()) return showError("errorInputTitle", "errorInputEdit");
+                if (!checkApiKey() || !file || !prompt.trim()) return showError("errorInputTitle", "errorInputEdit");
                 showLoader(true);
-                downloadTranslationBtn.classList.add('hidden');
+                downloadTextBtn.classList.add('hidden');
+                sourcesContainer.classList.add('hidden');
                 try {
                     const base64Data = await fileToBase64(file);
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
@@ -861,13 +818,7 @@
                     const result = await response.json();
                     if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
                     
-                    const candidate = result.candidates?.[0];
-                    if (!candidate) throw new Error("The AI did not return a valid response.");
-                    
-                    const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
-                    if (blockReason) throw new Error(`Request blocked due to: ${result?.promptFeedback?.blockReason || 'Safety Filters'}.`);
-
-                    const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
+                    const generatedPart = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
                     if (generatedPart?.inlineData?.data) {
                         const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
                         currentDownloadData = { type: 'image', content: imageUrl, title: 'edited-image' };
@@ -876,8 +827,7 @@
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
                     } else {
-                         let detailedError = "The AI could not edit the image. This might be due to safety filters. Please try different instructions.";
-                         throw new Error(detailedError);
+                         throw new Error("The AI could not edit the image due to safety filters. Please try different instructions.");
                     }
                 } catch (error) {
                     console.error("AI Edit Error:", error);
@@ -889,40 +839,24 @@
             };
             generateBtnAiEdit.addEventListener('click', () => editAIImage(uploadedEditFile, editPrompt.value));
             
-            // --- Real AI Image Merging (Image-to-Image) ---
             const mergeAIImages = async (file1, file2, prompt) => {
-                if (!checkApiKey()) return;
-                if (!file1 || !file2) return showError("errorInputTitle", "errorInputMerge");
+                if (!checkApiKey() || !file1 || !file2) return showError("errorInputTitle", "errorInputMerge");
                 showLoader(true);
-                downloadTranslationBtn.classList.add('hidden');
+                downloadTextBtn.classList.add('hidden');
+                sourcesContainer.classList.add('hidden');
                 try {
-                    const base64Data1 = await fileToBase64(file1);
-                    const base64Data2 = await fileToBase64(file2);
-
+                    const [base64Data1, base64Data2] = await Promise.all([fileToBase64(file1), fileToBase64(file2)]);
                     const userPrompt = prompt.trim() || "Merge these two images together creatively.";
-
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
                     const payload = { 
-                        contents: [{ 
-                            parts: [
-                                { text: userPrompt }, 
-                                { inlineData: { mimeType: file1.type, data: base64Data1 } },
-                                { inlineData: { mimeType: file2.type, data: base64Data2 } }
-                            ] 
-                        }], 
+                        contents: [{ parts: [{ text: userPrompt }, { inlineData: { mimeType: file1.type, data: base64Data1 } }, { inlineData: { mimeType: file2.type, data: base64Data2 } }] }], 
                         generationConfig: { responseModalities: ['IMAGE'] } 
                     };
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     const result = await response.json();
                     if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
                     
-                    const candidate = result.candidates?.[0];
-                    if (!candidate) throw new Error("The AI did not return a valid response.");
-                    
-                    const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
-                    if (blockReason) throw new Error(`Request blocked due to: ${result?.promptFeedback?.blockReason || 'Safety Filters'}.`);
-
-                    const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
+                    const generatedPart = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
                     if (generatedPart?.inlineData?.data) {
                         const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
                         currentDownloadData = { type: 'image', content: imageUrl, title: 'merged-image' };
@@ -931,8 +865,7 @@
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
                     } else {
-                         let detailedError = "The AI could not merge the images. This might be due to safety filters. Please try different images or instructions.";
-                         throw new Error(detailedError);
+                         throw new Error("The AI could not merge the images due to safety filters. Please try different images or instructions.");
                     }
                 } catch (error) {
                     console.error("AI Merge Error:", error);
@@ -944,116 +877,45 @@
             };
             generateBtnMerge.addEventListener('click', () => mergeAIImages(uploadedMergeFile1, uploadedMergeFile2, mergePrompt.value));
 
-            // --- Real AI Face Swap ---
-            const generateFaceSwap = async (fileSource, fileTarget) => {
-                if (!checkApiKey()) return;
-                if (!fileSource || !fileTarget) return showError("errorInputTitle", "errorInputFaceSwap");
-                showLoader(true);
-                downloadTranslationBtn.classList.add('hidden');
-                try {
-                    const base64DataSource = await fileToBase64(fileSource);
-                    const base64DataTarget = await fileToBase64(fileTarget);
-
-                    const userPrompt = `
-Act as a professional digital artist specializing in hyper-realistic photo manipulation. Your task is to perform a flawless face swap.
-
-**Source Image (First Image):** This image contains the face to be extracted.
-**Target Image (Second Image):** This image contains the body and scene where the new face will be placed.
-
-**Critical Instructions for a Perfect Swap:**
-1.  **Precise Extraction:** Isolate only the facial features (eyes, nose, mouth, cheeks, chin) from the Source Image. Do not include hair or neck if possible.
-2.  **Proportional Scaling & Alignment:** Carefully scale and rotate the extracted face to perfectly match the proportions and head angle of the person in the Target Image.
-3.  **Seamless Blending:** The connection point between the swapped face and the target's neck/jawline must be absolutely seamless. There should be no visible edges or lines.
-4.  **Skin Tone & Texture Matching:** Meticulously adjust the color balance, hue, saturation, and brightness of the source face to match the skin tone of the target body. Replicate the skin texture (pores, subtle imperfections) of the target image onto the new face.
-5.  **Lighting & Shadow Harmonization:** Analyze the lighting direction, intensity, and color in the Target Image. Re-light the swapped face so that all shadows and highlights on it are consistent with the surrounding environment. The face must look like it was naturally part of the original photo.
-6.  **Maintain Expression:** Preserve the original facial expression from the Source Image.
-
-The final output must be a single, photorealistic image that looks completely natural and unedited.`;
-
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
-                    const payload = { 
-                        contents: [{ 
-                            parts: [
-                                { text: userPrompt }, 
-                                { inlineData: { mimeType: fileSource.type, data: base64DataSource } },
-                                { inlineData: { mimeType: fileTarget.type, data: base64DataTarget } }
-                            ] 
-                        }], 
-                        generationConfig: { responseModalities: ['IMAGE'] } 
-                    };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
-                    
-                    const candidate = result.candidates?.[0];
-                    if (!candidate) throw new Error("The AI did not return a valid response.");
-                    
-                    const blockReason = candidate.finishReason === 'SAFETY' || result?.promptFeedback?.blockReason;
-                    if (blockReason) throw new Error(`Request blocked due to: ${result?.promptFeedback?.blockReason || 'Safety Filters'}.`);
-
-                    const generatedPart = candidate.content?.parts?.find(p => p.inlineData);
-                    if (generatedPart?.inlineData?.data) {
-                        const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
-                        currentDownloadData = { type: 'image', content: imageUrl, title: 'face-swap-result' };
-                        generatedImage.src = imageUrl;
-                        textResultContainer.classList.add('hidden');
-                        imageResultContainer.classList.remove('hidden');
-                        showPaymentUI('image');
-                    } else {
-                         let detailedError = "The AI could not perform the face swap. This might be due to safety filters. Please try different images.";
-                         throw new Error(detailedError);
-                    }
-                } catch (error) {
-                    console.error("AI Face Swap Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
-                } finally {
-                    showLoader(false);
-                }
-            };
-            generateBtnFaceSwap.addEventListener('click', () => generateFaceSwap(uploadedFaceSwapSource, uploadedFaceSwapTarget));
-
-
-            // --- Result Cancellation Logic ---
             const cancelResult = () => {
                 resultSection.classList.add('hidden');
-                downloadTranslationBtn.classList.add('hidden');
+                downloadTextBtn.classList.add('hidden');
                 currentDownloadData = { type: null, content: null, title: 'content' };
             };
             cancelGenerationBtn.addEventListener('click', cancelResult);
             cancelArticleBtn.addEventListener('click', cancelResult);
 
-             // --- Download Logic ---
             const downloadTextAsZip = async (title, content) => {
                 const doc = new jsPDF();
                 const zip = new JSZip();
+                doc.setFont('Helvetica'); 
+                doc.setLanguage('ar');
+                
+                const lines = doc.splitTextToSize(content, 180);
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                let y = 15;
 
-                 doc.setFont('Helvetica'); 
-                 doc.setLanguage('ar');
-                 
-                 const lines = doc.splitTextToSize(content, 180);
-                 const pageHeight = doc.internal.pageSize.height;
-                 const pageWidth = doc.internal.pageSize.width;
-                 let y = 15;
-
-                 for(let i = 0; i < lines.length; i++) {
+                for(let i = 0; i < lines.length; i++) {
                     if (y > pageHeight - 20) {
                         doc.addPage();
                         y = 15;
                     }
                     doc.text(lines[i], pageWidth - 15, y, { align: 'right' });
                     y += 7;
-                 }
+                }
                 
                 const pdfBlob = doc.output('blob');
-                zip.file(`${title.replace(/ /g, "_")}.pdf`, pdfBlob);
+                zip.file(`${title.replace(/\s/g, "_")}.pdf`, pdfBlob);
                 
                 const zipBlob = await zip.generateAsync({ type: "blob" });
                 const url = URL.createObjectURL(zipBlob);
                 const tempLink = document.createElement('a');
                 tempLink.href = url;
                 tempLink.download = 'ai_content.zip';
+                document.body.appendChild(tempLink);
                 tempLink.click();
+                document.body.removeChild(tempLink);
                 URL.revokeObjectURL(url);
             };
 
@@ -1064,164 +926,93 @@ The final output must be a single, photorealistic image that looks completely na
                     return;
                 }
                 
-                if (currentDownloadData.type === 'translation') {
-                    await downloadTextAsZip(currentDownloadData.title, currentDownloadData.content);
-                } else if (currentDownloadData.type.includes('image')){
+                if (currentDownloadData.type.includes('image')) {
                     const imageUrl = await prepareImageForDownload(currentDownloadData.content);
                     if (imageUrl) {
                         const tempLink = document.createElement('a');
                         tempLink.href = imageUrl;
                         tempLink.download = 'ai_image.png';
+                        document.body.appendChild(tempLink);
                         tempLink.click();
+                        document.body.removeChild(tempLink);
                     }
-                }
-            });
-            
-            // --- Image Upload & Preview Reset Logic ---
-            const resetEditPreview = () => {
-                uploadedEditFile = null;
-                editImageUpload.value = null; 
-                editImagePreview.src = '#';
-                editImagePreview.classList.add('hidden');
-                cancelPreviewBtn.classList.add('hidden');
-                editImagePlaceholder.classList.remove('hidden');
-                editPrompt.disabled = true;
-                editPrompt.value = '';
-                generateBtnAiEdit.disabled = true;
-            };
-            cancelPreviewBtn.addEventListener('click', resetEditPreview);
-            
-            const resetMergePreview1 = () => {
-                uploadedMergeFile1 = null;
-                mergeImageUpload1.value = null;
-                mergeImagePreview1.src = '#';
-                mergeImagePreview1.classList.add('hidden');
-                cancelPreviewBtnMerge1.classList.add('hidden');
-                mergeImagePlaceholder1.classList.remove('hidden');
-                generateBtnMerge.disabled = true;
-            };
-            cancelPreviewBtnMerge1.addEventListener('click', resetMergePreview1);
-            
-            const resetMergePreview2 = () => {
-                uploadedMergeFile2 = null;
-                mergeImageUpload2.value = null;
-                mergeImagePreview2.src = '#';
-                mergeImagePreview2.classList.add('hidden');
-                cancelPreviewBtnMerge2.classList.add('hidden');
-                mergeImagePlaceholder2.classList.remove('hidden');
-                generateBtnMerge.disabled = true;
-            };
-            cancelPreviewBtnMerge2.addEventListener('click', resetMergePreview2);
-            
-            const resetFaceSwapPreviewSource = () => {
-                uploadedFaceSwapSource = null;
-                faceswapImageUploadSource.value = null;
-                faceswapImagePreviewSource.src = '#';
-                faceswapImagePreviewSource.classList.add('hidden');
-                cancelPreviewBtnFaceSwapSource.classList.add('hidden');
-                faceswapImagePlaceholderSource.classList.remove('hidden');
-                generateBtnFaceSwap.disabled = true;
-            };
-            cancelPreviewBtnFaceSwapSource.addEventListener('click', resetFaceSwapPreviewSource);
-
-            const resetFaceSwapPreviewTarget = () => {
-                uploadedFaceSwapTarget = null;
-                faceswapImageUploadTarget.value = null;
-                faceswapImagePreviewTarget.src = '#';
-                faceswapImagePreviewTarget.classList.add('hidden');
-                cancelPreviewBtnFaceSwapTarget.classList.add('hidden');
-                faceswapImagePlaceholderTarget.classList.remove('hidden');
-                generateBtnFaceSwap.disabled = true;
-            };
-            cancelPreviewBtnFaceSwapTarget.addEventListener('click', resetFaceSwapPreviewTarget);
-
-
-            // --- Image Upload Handlers ---
-            editImageUpload.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    uploadedEditFile = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        editImagePlaceholder.classList.add('hidden');
-                        editImagePreview.src = event.target.result;
-                        editImagePreview.classList.remove('hidden');
-                        cancelPreviewBtn.classList.remove('hidden');
-                        editPrompt.disabled = false;
-                        generateBtnAiEdit.disabled = false;
-                    };
-                    reader.readAsDataURL(uploadedEditFile);
                 } else {
-                   resetEditPreview();
+                    await downloadTextAsZip(currentDownloadData.title, currentDownloadData.content);
                 }
             });
+            
+            ['edit-image-upload', 'merge-image-upload-1', 'merge-image-upload-2'].forEach(id => {
+                document.getElementById(id).addEventListener('change', (e) => handleImageUpload(e, id));
+            });
 
-             const handleMergeImageUpload = (e, fileNumber) => {
-                if (e.target.files && e.target.files[0]) {
+            const handleImageUpload = (e, id) => {
+                 if (e.target.files && e.target.files[0]) {
                     const file = e.target.files[0];
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        if (fileNumber === 1) {
-                            uploadedMergeFile1 = file;
-                            mergeImagePlaceholder1.classList.add('hidden');
-                            mergeImagePreview1.src = event.target.result;
-                            mergeImagePreview1.classList.remove('hidden');
-                            cancelPreviewBtnMerge1.classList.remove('hidden');
-                        } else {
-                            uploadedMergeFile2 = file;
-                            mergeImagePlaceholder2.classList.add('hidden');
-                            mergeImagePreview2.src = event.target.result;
-                            mergeImagePreview2.classList.remove('hidden');
-                            cancelPreviewBtnMerge2.classList.remove('hidden');
-                        }
-                        if (uploadedMergeFile1 && uploadedMergeFile2) {
-                            generateBtnMerge.disabled = false;
-                        }
+                       switch(id) {
+                           case 'edit-image-upload':
+                                uploadedEditFile = file;
+                                document.getElementById('edit-image-placeholder').classList.add('hidden');
+                                document.getElementById('edit-image-preview').src = event.target.result;
+                                document.getElementById('edit-image-preview').classList.remove('hidden');
+                                document.getElementById('cancel-preview-btn').classList.remove('hidden');
+                                document.getElementById('edit-prompt').disabled = false;
+                                document.getElementById('generate-btn-aiedit').disabled = false;
+                                break;
+                           case 'merge-image-upload-1':
+                                uploadedMergeFile1 = file;
+                                document.getElementById('merge-image-placeholder-1').classList.add('hidden');
+                                document.getElementById('merge-image-preview-1').src = event.target.result;
+                                document.getElementById('merge-image-preview-1').classList.remove('hidden');
+                                document.getElementById('cancel-preview-btn-merge-1').classList.remove('hidden');
+                                break;
+                           case 'merge-image-upload-2':
+                                uploadedMergeFile2 = file;
+                                document.getElementById('merge-image-placeholder-2').classList.add('hidden');
+                                document.getElementById('merge-image-preview-2').src = event.target.result;
+                                document.getElementById('merge-image-preview-2').classList.remove('hidden');
+                                document.getElementById('cancel-preview-btn-merge-2').classList.remove('hidden');
+                                break;
+                       }
+                       if (uploadedMergeFile1 && uploadedMergeFile2) {
+                           generateBtnMerge.disabled = false;
+                       }
                     };
                     reader.readAsDataURL(file);
                 }
             };
 
-            mergeImageUpload1.addEventListener('change', (e) => handleMergeImageUpload(e, 1));
-            mergeImageUpload2.addEventListener('change', (e) => handleMergeImageUpload(e, 2));
+            document.getElementById('cancel-preview-btn').addEventListener('click', () => {
+                uploadedEditFile = null;
+                document.getElementById('edit-image-upload').value = null;
+                document.getElementById('edit-image-preview').classList.add('hidden');
+                document.getElementById('edit-image-placeholder').classList.remove('hidden');
+                document.getElementById('cancel-preview-btn').classList.add('hidden');
+                document.getElementById('edit-prompt').disabled = true;
+                generateBtnAiEdit.disabled = true;
+            });
+             document.getElementById('cancel-preview-btn-merge-1').addEventListener('click', () => {
+                uploadedMergeFile1 = null;
+                document.getElementById('merge-image-upload-1').value = null;
+                document.getElementById('merge-image-preview-1').classList.add('hidden');
+                document.getElementById('merge-image-placeholder-1').classList.remove('hidden');
+                document.getElementById('cancel-preview-btn-merge-1').classList.add('hidden');
+                generateBtnMerge.disabled = true;
+            });
+             document.getElementById('cancel-preview-btn-merge-2').addEventListener('click', () => {
+                uploadedMergeFile2 = null;
+                document.getElementById('merge-image-upload-2').value = null;
+                document.getElementById('merge-image-preview-2').classList.add('hidden');
+                document.getElementById('merge-image-placeholder-2').classList.remove('hidden');
+                document.getElementById('cancel-preview-btn-merge-2').classList.add('hidden');
+                generateBtnMerge.disabled = true;
+            });
 
-             const handleFaceSwapImageUpload = (e, type) => {
-                if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        if (type === 'source') {
-                            uploadedFaceSwapSource = file;
-                            faceswapImagePlaceholderSource.classList.add('hidden');
-                            faceswapImagePreviewSource.src = event.target.result;
-                            faceswapImagePreviewSource.classList.remove('hidden');
-                            cancelPreviewBtnFaceSwapSource.classList.remove('hidden');
-                        } else {
-                            uploadedFaceSwapTarget = file;
-                            faceswapImagePlaceholderTarget.classList.add('hidden');
-                            faceswapImagePreviewTarget.src = event.target.result;
-                            faceswapImagePreviewTarget.classList.remove('hidden');
-                            cancelPreviewBtnFaceSwapTarget.classList.remove('hidden');
-                        }
-                        if (uploadedFaceSwapSource && uploadedFaceSwapTarget) {
-                            generateBtnFaceSwap.disabled = false;
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            faceswapImageUploadSource.addEventListener('change', (e) => handleFaceSwapImageUpload(e, 'source'));
-            faceswapImageUploadTarget.addEventListener('change', (e) => handleFaceSwapImageUpload(e, 'target'));
-
-
-            // --- Initial Load ---
             setLanguage(currentLang);
         });
     </script>
 
 </body>
 </html>
-
-
-
-
 
