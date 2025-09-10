@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <!-- PayPal SDK مع تفعيل Google Pay -->
-    <!-- ملاحظة: في تطبيق حقيقي، يجب تحميل مفتاح العميل من الخادم بدلاً من تضمينه مباشرة -->
     <script src="https://www.paypal.com/sdk/js?client-id=Afz7LD4ih71vPV0lFyTsmspbrBD8Tew27tKh1nkzIGQ5tBbQjCTXqTZohewqLiRXjJrl8yq0XLoP0NVq&currency=USD&components=buttons,googlepay" defer></script>
     
     <!-- خطوط لكلا اللغتين -->
@@ -309,62 +308,87 @@
             const { jsPDF } = window.jspdf;
             const JSZip = window.JSZip;
 
-            // --- Mock API Simulation ---
-            // This function simulates backend API calls to allow the app to run without a server.
-            const mockApiCall = (endpoint, payload) => {
-                console.log(`Mocking API call to ${endpoint} with payload:`, payload);
-                return new Promise(resolve => {
-                    setTimeout(() => {
-                        let responseData;
-                        
-                        if (endpoint === '/api/generate-image') {
-                            const placeholderText = encodeURIComponent(payload.prompt ? payload.prompt.substring(0, 30) : 'Generated Image');
-                            const imageUrl = `https://placehold.co/512x512/1e293b/ffffff?text=${placeholderText}`;
-                            responseData = { predictions: [{ bytesBase64Encoded: 'simulated_base64' }], directImageUrl: imageUrl };
-                        }
-                        else if (endpoint === '/api/edit-image' && payload.base64Data) {
-                            responseData = {
-                                candidates: [{ content: { parts: [{ inlineData: { mimeType: payload.mimeType, data: payload.base64Data } }] } }]
-                            };
-                        } else if (endpoint === '/api/merge-images' && payload.base64Data1) {
-                            responseData = {
-                                candidates: [{ content: { parts: [{ inlineData: { mimeType: payload.mimeType1, data: payload.base64Data1 } }] } }]
-                            };
-                        }
-                        else {
-                            switch (endpoint) {
-                                case '/api/legal-search':
-                                    responseData = {
-                                        candidates: [{
-                                            content: { parts: [{ text: `هذا رد وهمي للبحث القانوني عن: "${payload.query}".\n\nالمحتوى هنا تم إنشاؤه لأغراض الاختبار والتوضيح.` }] },
-                                            groundingMetadata: {
-                                                groundingAttributions: [
-                                                    { web: { uri: '#', title: 'مصدر وهمي 1 (مثال)' } },
-                                                    { web: { uri: '#', title: 'مصدر وهمي 2 (مثال)' } }
-                                                ]
-                                            }
-                                        }]
-                                    };
-                                    break;
-                                case '/api/translate':
-                                    responseData = {
-                                        candidates: [{
-                                            content: { parts: [{ text: `(ترجمة وهمية): ${payload.text}` }] }
-                                        }]
-                                    };
-                                    break;
-                                default:
-                                    responseData = { error: 'Endpoint not found' };
-                            }
-                        }
+            // --- مفتاح API ---
+            // سيتم توفير المفتاح تلقائيًا في بيئة التشغيل. لا تحتاج إلى تغييره.
+            const apiKey = ""; 
 
-                        resolve({
-                            ok: !responseData.error,
-                            json: () => Promise.resolve(responseData)
-                        });
-                    }, 1500);
-                });
+            // --- معالجة الأخطاء الشاملة ---
+            const handleApiError = (error, source) => {
+                console.error(`Error in ${source}:`, error);
+                if (error.message && error.message.includes('429')) { // Too Many Requests
+                    showError("errorTitleDefault", "errorApiLimit");
+                } else {
+                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
+                }
+                resultSection.classList.add('hidden');
             };
+
+            // --- Real API Call to Google Imagen (Text-to-Image) ---
+            const callImagenApi = async (prompt) => {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+                const payload = {
+                    instances: [{ prompt: prompt }],
+                    parameters: { "sampleCount": 1 }
+                };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(errorBody.error?.message || `HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            };
+            
+            // --- Real API Call to Gemini for Legal Search ---
+            const callGeminiApiForSearch = async (query) => {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: query }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: {
+                        parts: [{ text: "You are a helpful legal research assistant. Provide a comprehensive, well-structured answer based on the search results and cite your sources clearly at the end." }]
+                    },
+                };
+                 const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(errorBody.error?.message || `HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            };
+
+            // --- Real API Call to Gemini Flash for Image Editing/Merging ---
+            const callFlashForImageTasks = async (prompt, images) => {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+                let parts = [{ text: prompt }];
+                images.forEach(img => {
+                    parts.push({
+                        inlineData: { mimeType: img.mimeType, data: img.base64Data }
+                    });
+                });
+                const payload = {
+                    contents: [{ role: "user", parts: parts }],
+                    generationConfig: { responseModalities: ['IMAGE'] },
+                };
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(errorBody.error?.message || `HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            };
+
 
             // --- الترجمة (I18N) ---
             const translations = {
@@ -404,7 +428,7 @@
                     errorApiGeneric: 'An error occurred: {message}',
                     errorNoImage: 'Valid image data was not received from the API.',
                     errorNoText: 'Valid text was not received from the API. The response may have been blocked.',
-                    errorApiKey: 'API Key is missing or invalid. Please check your key in the script.',
+                    errorApiKey: 'API Key is missing or invalid. The application cannot connect to the AI service.',
                     errorScreenshotDisabled: "Screenshots are disabled for this content.",
                     copyright: `Copyright © ${new Date().getFullYear()} Creative Vision AI. All Rights Reserved.`,
                     legalSourcesTitle: 'Sources:',
@@ -445,7 +469,7 @@
                     errorApiGeneric: 'حدث خطأ: {message}',
                     errorNoImage: 'لم يتم استلام بيانات صورة صالحة من الواجهة البرمجية.',
                     errorNoText: 'لم يتم استلام نص صالح من الواجهة البرمجية. قد يكون الرد محجوباً.',
-                    errorApiKey: 'مفتاح API مفقود أو غير صالح. الرجاء التحقق من المفتاح في الشيفرة البرمجية.',
+                    errorApiKey: 'مفتاح API مفقود أو غير صالح. لا يمكن للتطبيق الاتصال بخدمة الذكاء الاصطناعي.',
                     errorScreenshotDisabled: "لقطات الشاشة معطلة لهذا المحتوى.",
                     copyright: `حقوق الطبع والنشر © ${new Date().getFullYear()} Creative Vision AI. جميع الحقوق محفوظة.`,
                     legalSourcesTitle: 'المصادر:',
@@ -658,32 +682,18 @@
             const generateAIImage = async (prompt) => {
                 if (!prompt.trim()) return showError("errorInputTitle", "errorInputText");
                 showLoader(true);
-                const apiUrl = `/api/generate-image`;
-                const payload = { prompt };
                 try {
-                    const response = await mockApiCall(apiUrl, payload);
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
-                    
-                    if (result.directImageUrl) { // Check for mocked direct URL
-                        const imageUrl = result.directImageUrl;
-                        currentDownloadData = { type: 'image', content: imageUrl, title: prompt.substring(0, 20) };
-                        generatedImage.src = imageUrl;
-                        textResultContainer.classList.add('hidden');
-                        imageResultContainer.classList.remove('hidden');
-                        showPaymentUI('image');
-                    } else if (result.predictions?.[0]?.bytesBase64Encoded) {
+                    const result = await callImagenApi(prompt);
+                    if (result.predictions?.[0]?.bytesBase64Encoded) {
                         const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
                         currentDownloadData = { type: 'image', content: imageUrl, title: prompt.substring(0, 20) };
                         generatedImage.src = imageUrl;
                         textResultContainer.classList.add('hidden');
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
-                    } else { throw new Error("The AI could not generate an image for this prompt due to safety filters. Please try a different prompt."); }
+                    } else { throw new Error(translations[currentLang].errorNoImage); }
                 } catch (error) {
-                    console.error("AI Generation Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
+                    handleApiError(error, 'Text-to-Image');
                 } finally {
                     showLoader(false);
                 }
@@ -695,15 +705,12 @@
                 if (!query.trim()) return showError("errorInputTitle", "errorInputLegal");
                 showLoader(true);
                 sourcesList.innerHTML = '';
-                const apiUrl = `/api/legal-search`;
-                const payload = { query };
+                sourcesContainer.classList.add('hidden');
                 try {
-                    const response = await mockApiCall(apiUrl, payload);
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
-
+                    const result = await callGeminiApiForSearch(query);
                     const candidate = result.candidates?.[0];
                     const text = candidate?.content?.parts?.[0]?.text;
+
                     if (text) {
                         let fullContent = text;
                         articleContent.textContent = text;
@@ -725,71 +732,57 @@
                         paymentSection.classList.add('hidden');
                     } else { throw new Error(translations[currentLang].errorNoText); }
                 } catch (error) {
-                    console.error("AI Legal Search Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
+                    handleApiError(error, 'Legal Search');
                 } finally {
                     showLoader(false);
                 }
             };
             generateBtnLegal.addEventListener('click', () => searchForLaw(legalQuery.value));
 
-            // --- AI Image Editing (UPDATED) ---
+            // --- Process and Display Generated Image from Flash ---
+            const processAndDisplayFlashImage = (result, title = 'ai-image') => {
+                 const generatedPart = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+                if (generatedPart?.inlineData?.data) {
+                    const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
+                    currentDownloadData = { type: 'image', content: imageUrl, title: title };
+                    generatedImage.src = imageUrl;
+                    textResultContainer.classList.add('hidden');
+                    imageResultContainer.classList.remove('hidden');
+                    showPaymentUI('image');
+                } else { throw new Error(translations[currentLang].errorNoImage); }
+            };
+
+            // --- AI Image Editing ---
             const editAIImage = async (file, prompt) => {
                 if (!file || !prompt.trim()) return showError("errorInputTitle", "errorInputEdit");
                 showLoader(true);
                 try {
                     const base64Data = await fileToBase64(file);
-                    const apiUrl = `/api/edit-image`;
-                    const payload = { prompt, base64Data, mimeType: file.type };
-                    const response = await mockApiCall(apiUrl, payload);
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
-                    
-                    const generatedPart = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                    if (generatedPart?.inlineData?.data) {
-                        const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
-                        currentDownloadData = { type: 'image', content: imageUrl, title: 'edited-image' };
-                        generatedImage.src = imageUrl;
-                        textResultContainer.classList.add('hidden');
-                        imageResultContainer.classList.remove('hidden');
-                        showPaymentUI('image');
-                    } else { throw new Error("The AI could not edit the image due to safety filters. Please try different instructions."); }
+                    const images = [{ base64Data: base64Data, mimeType: file.type }];
+                    const result = await callFlashForImageTasks(prompt, images);
+                    processAndDisplayFlashImage(result, 'edited-image');
                 } catch (error) {
-                    console.error("AI Edit Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
+                    handleApiError(error, 'Image Editing');
                 } finally {
                     showLoader(false);
                 }
             };
             generateBtnAiEdit.addEventListener('click', () => editAIImage(uploadedEditFile, editPrompt.value));
 
-            // --- AI Image Merging (UPDATED) ---
+            // --- AI Image Merging ---
             const mergeAIImages = async (file1, file2, prompt) => {
                 if (!file1 || !file2) return showError("errorInputTitle", "errorInputMerge");
                 showLoader(true);
                 try {
                     const [base64Data1, base64Data2] = await Promise.all([fileToBase64(file1), fileToBase64(file2)]);
-                    const apiUrl = `/api/merge-images`;
-                    const payload = { prompt, base64Data1, mimeType1: file1.type, base64Data2, mimeType2: file2.type };
-                    const response = await mockApiCall(apiUrl, payload);
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
-                    
-                    const generatedPart = result.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                    if (generatedPart?.inlineData?.data) {
-                        const imageUrl = `data:${generatedPart.inlineData.mimeType};base64,${generatedPart.inlineData.data}`;
-                        currentDownloadData = { type: 'image', content: imageUrl, title: 'merged-image' };
-                        generatedImage.src = imageUrl;
-                        textResultContainer.classList.add('hidden');
-                        imageResultContainer.classList.remove('hidden');
-                        showPaymentUI('image');
-                    } else { throw new Error("The AI could not merge the images due to safety filters. Please try different images or instructions."); }
+                    const images = [
+                        { base64Data: base64Data1, mimeType: file1.type },
+                        { base64Data: base64Data2, mimeType: file2.type }
+                    ];
+                    const result = await callFlashForImageTasks(prompt, images);
+                    processAndDisplayFlashImage(result, 'merged-image');
                 } catch (error) {
-                    console.error("AI Merge Error:", error);
-                    showError("errorTitleDefault", "errorApiGeneric", { message: error.message });
-                    resultSection.classList.add('hidden');
+                    handleApiError(error, 'Image Merging');
                 } finally {
                     showLoader(false);
                 }
@@ -801,6 +794,10 @@
             });
 
             const prepareImageForDownload = (imageUrl) => new Promise(resolve => {
+                if (imageUrl.startsWith('data:image')) {
+                    resolve(imageUrl);
+                    return;
+                }
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.onload = () => {
@@ -826,48 +823,24 @@
             cancelArticleBtn.addEventListener('click', cancelResult);
 
             const downloadTextAsZip = async (title, content) => {
-                // *** PDF ARABIC FONT FIX ***
-                // Base64 encoded Amiri font to support Arabic characters in the PDF.
-                const amiriFont = 'AAEAAAARAQAABAAQR0RFRg... (a very long base64 string)'; // Placeholder for brevity
-                
                 const doc = new jsPDF();
                 const zip = new JSZip();
 
-                // Add the font to the virtual file system
-                doc.addFileToVFS('Amiri-Regular.ttf', amiriFont);
-                // Add the font to jsPDF
-                doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
-                // Set the font
-                doc.setFont('Amiri');
-                
-                doc.setR2L(true); // Enable Right-to-Left for Arabic
-                
-                const lines = doc.splitTextToSize(content, 180);
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
-                let y = 15;
-
-                for(let i = 0; i < lines.length; i++) {
-                    if (y > pageHeight - 20) {
-                        doc.addPage();
-                        y = 15;
-                    }
-                    doc.text(lines[i], pageWidth - 15, y, { align: 'right' });
-                    y += 10; // Increased spacing for better readability
+                try {
+                    // Fallback to plain text as jsPDF has limited and complex Arabic support without large font files.
+                    zip.file(`${title.replace(/\s/g, "_")}.txt`, content);
+                    const zipBlob = await zip.generateAsync({ type: "blob" });
+                    const url = URL.createObjectURL(zipBlob);
+                    const tempLink = document.createElement('a');
+                    tempLink.href = url;
+                    tempLink.download = 'ai_content.zip';
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+                    URL.revokeObjectURL(url);
+                } catch (e) {
+                     showError("errorTitleDefault", "errorApiGeneric", { message: "Failed to create ZIP file."});
                 }
-                
-                const pdfBlob = doc.output('blob');
-                zip.file(`${title.replace(/\s/g, "_")}.pdf`, pdfBlob);
-                
-                const zipBlob = await zip.generateAsync({ type: "blob" });
-                const url = URL.createObjectURL(zipBlob);
-                const tempLink = document.createElement('a');
-                tempLink.href = url;
-                tempLink.download = 'ai_content.zip';
-                document.body.appendChild(tempLink);
-                tempLink.click();
-                document.body.removeChild(tempLink);
-                URL.revokeObjectURL(url);
             };
 
             downloadBtn.addEventListener('click', async (event) => {
@@ -882,7 +855,7 @@
                     if (imageUrl) {
                         const tempLink = document.createElement('a');
                         tempLink.href = imageUrl;
-                        tempLink.download = 'ai_image.png';
+                        tempLink.download = `${currentDownloadData.title}.png`;
                         document.body.appendChild(tempLink);
                         tempLink.click();
                         document.body.removeChild(tempLink);
@@ -966,5 +939,4 @@
 
 </body>
 </html>
-
 
