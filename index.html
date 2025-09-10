@@ -336,12 +336,8 @@
             const { jsPDF } = window.jspdf;
             const JSZip = window.JSZip;
 
-            // --- IMPORTANT: API Key is now handled by the backend ---
-
-            // --- Backend API URLs ---
-            const API_BASE_URL = 'http://localhost:3000';
-            const GENERATE_IMAGE_URL = `${API_BASE_URL}/generate-image`;
-            const LEGAL_SEARCH_URL = `${API_BASE_URL}/legal-search`;
+            // --- IMPORTANT: API Key ---
+            const apiKey = "AIzaSyDHG1ON1VXbUWfoSMn9tBZq2ZAIMMdkuS4";
             
 
             // --- I18N (Internationalization) ---
@@ -658,25 +654,22 @@
 
             // --- Real AI Image Generation (Text-to-Image) ---
             const generateAIImage = async (prompt) => {
-                if (!prompt.trim()) return showError("errorInputTitle", "errorInputText");
+                if (!checkApiKey() || !prompt.trim()) return showError("errorInputTitle", "errorInputText");
                 showLoader(true);
                 downloadTextBtn.classList.add('hidden');
                 sourcesContainer.classList.add('hidden');
-                const apiUrl = `http://localhost:3000/generate-image`; // <-- الرابط الجديد للسيرفر المحلي
-                const payload = { prompt };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+                const payload = { instances: [{ prompt }], parameters: { "sampleCount": 1 } };
 
                 try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
                     
-                    if (result.imageUrl) {
-                        currentDownloadData = { type: 'image', content: result.imageUrl, title: prompt.substring(0, 20) };
-                        generatedImage.src = result.imageUrl;
+                    if (result.predictions?.[0]?.bytesBase64Encoded) {
+                        const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                        currentDownloadData = { type: 'image', content: imageUrl, title: prompt.substring(0, 20) };
+                        generatedImage.src = imageUrl;
                         textResultContainer.classList.add('hidden');
                         imageResultContainer.classList.remove('hidden');
                         showPaymentUI('image');
@@ -695,37 +688,40 @@
 
             // --- AI Legal Research ---
             const searchForLaw = async (query) => {
-                if (!query.trim()) return showError("errorInputTitle", "errorInputLegal");
+                if (!checkApiKey() || !query.trim()) return showError("errorInputTitle", "errorInputLegal");
                 showLoader(true);
                 downloadTextBtn.classList.add('hidden');
                 sourcesContainer.classList.add('hidden');
                 sourcesList.innerHTML = '';
 
-                const apiUrl = `http://localhost:3000/legal-search`; // <-- الرابط الجديد للسيرفر المحلي
-                const payload = { query };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const systemPrompt = "You are a professional legal assistant. Your task is to find official laws and legal articles based on the user's query. Use the search tool to find the most accurate and up-to-date information from official government or legal sources. Provide a clear summary of the law, and you MUST cite your sources.";
+                const payload = {
+                    contents: [{ parts: [{ text: query }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
 
                 try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    if (!response.ok) throw new Error(result.error?.message || `HTTP error! status: ${response.status}`);
 
-                    const text = result.text;
+                    const candidate = result.candidates?.[0];
+                    const text = candidate?.content?.parts?.[0]?.text;
                     if (text) {
                         let fullContent = text;
                         articleContent.textContent = text;
                         
-                        if (result.sources && result.sources.length > 0) {
+                        const groundingMetadata = candidate.groundingMetadata;
+                        if (groundingMetadata?.groundingAttributions?.length > 0) {
                             fullContent += `\n\n---\n${translations[currentLang].legalSourcesTitle}\n`;
                             sourcesContainer.classList.remove('hidden');
-                            result.sources.forEach(source => {
+                            groundingMetadata.groundingAttributions.forEach(att => {
                                 const li = document.createElement('li');
-                                li.innerHTML = `<a href="${source.uri}" target="_blank" class="text-blue-400 hover:underline">${source.title}</a>`;
+                                li.innerHTML = `<a href="${att.web.uri}" target="_blank" class="text-blue-400 hover:underline">${att.web.title}</a>`;
                                 sourcesList.appendChild(li);
-                                fullContent += `\n- ${source.title}: ${source.uri}`;
+                                fullContent += `\n- ${att.web.title}: ${att.web.uri}`;
                             });
                         }
                         
