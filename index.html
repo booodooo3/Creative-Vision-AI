@@ -22,9 +22,6 @@
         body {
             font-family: 'Tajawal', sans-serif;
         }
-        #page-content-wrapper {
-            display: none; /* Hide content until unlocked */
-        }
         .tab-btn {
             transition: all 0.3s ease-in-out;
         }
@@ -144,209 +141,195 @@
 </head>
 <body class="bg-slate-900 text-gray-200 flex flex-col items-center justify-center min-h-screen p-4">
 
-    <!-- Subscription Lock Modal -->
-    <div id="subscription-lock" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
-            <h2 class="text-2xl font-bold mb-4" data-key="subscriptionTitle">وصول حصري</h2>
-            <p class="text-slate-400 mb-6" data-key="subscriptionMessage">هذا المحتوى متاح للمشتركين فقط. الرجاء إدخال رمز الوصول الخاص بك.</p>
-            <input type="password" id="subscription-code" data-key-placeholder="subscriptionPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 text-center focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="ادخل رمز الوصول">
-            <p id="subscription-error" class="text-red-400 text-sm mt-2 h-5"></p>
-            <button id="unlock-btn" data-key="unlockBtnText" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">فتح</button>
-            <a href="mailto:beloushi9@gmail.com" class="text-slate-400 text-sm mt-6 block hover:text-blue-400 hover:underline">beloushi9@gmail.com</a>
+    <!-- Language Switcher Moved Here -->
+    <div class="w-full max-w-4xl flex justify-start rtl:justify-end mb-2">
+        <div id="lang-switcher-container" class="flex space-x-2 rtl:space-x-reverse">
+            <button id="lang-btn-en" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">E</button>
+            <button id="lang-btn-ar" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">A</button>
         </div>
     </div>
-    
-    <div id="page-content-wrapper" class="w-full">
-        <!-- Language Switcher Moved Here -->
-        <div class="w-full max-w-4xl flex justify-start rtl:justify-end mb-2 mx-auto">
-            <div id="lang-switcher-container" class="flex space-x-2 rtl:space-x-reverse">
-                <button id="lang-btn-en" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">E</button>
-                <button id="lang-btn-ar" class="lang-btn bg-slate-700 hover:bg-slate-600 text-white font-bold w-10 h-10 rounded-lg flex items-center justify-center transition duration-300 text-lg">A</button>
+
+    <div id="main-content-wrapper" class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6">
+        <!-- Header -->
+        <header class="text-center">
+            <img src="https://intrigued-isabelle-4i.zipwp.link/wp-content/uploads/2025/09/Opera-Snapshot_2025-09-05_220207_index.html.png" alt="Creative Vision AI Title" class="mx-auto w-full max-w-md rounded-lg">
+        </header>
+
+        <!-- Error Message Box -->
+        <div id="error-message-box" class="p-4 mb-4 text-sm text-red-300 bg-red-900/50 rounded-lg border border-red-800/50 flex items-center gap-3" role="alert">
+            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+            <div>
+                <span id="error-title" class="font-bold" data-key="errorTitleDefault"></span> 
+                <span id="error-text"></span>
             </div>
         </div>
 
-        <div id="main-content-wrapper" class="w-full max-w-4xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8 space-y-6 mx-auto">
-            <!-- Header -->
-            <header class="text-center">
-                <img src="https://intrigued-isabelle-4i.zipwp.link/wp-content/uploads/2025/09/Opera-Snapshot_2025-09-05_220207_index.html.png" alt="Creative Vision AI Title" class="mx-auto w-full max-w-md rounded-lg">
-            </header>
+        <!-- Tabs -->
+        <div class="border-b border-slate-700">
+            <nav class="-mb-px flex space-x-4 rtl:space-x-reverse overflow-x-auto pb-px" aria-label="Tabs">
+                <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
+                <button id="tab-legal" data-key="tabLegal" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">الباحث القانوني</button>
+                <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
+                <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
+                <button id="tab-merge" data-key="tabMerge" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">دمج الصور</button>
+            </nav>
+        </div>
 
-            <!-- Error Message Box -->
-            <div id="error-message-box" class="p-4 mb-4 text-sm text-red-300 bg-red-900/50 rounded-lg border border-red-800/50 flex items-center gap-3" role="alert">
-                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+        <!-- Tab Content -->
+        <div id="tab-content-text" class="tab-content">
+            <textarea id="text-prompt" data-key-placeholder="textPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي..."></textarea>
+            <button id="generate-btn-text" data-key="generateBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">إنشاء صورة</button>
+        </div>
+
+        <div id="tab-content-legal" class="tab-content hidden space-y-4">
+            <input type="text" id="legal-query" data-key-placeholder="legalQueryPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: قانون التجارة في دولة الكويت...">
+            <button id="generate-btn-legal" data-key="searchBtn" class="generate-btn w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">بحث</button>
+        </div>
+
+        <div id="tab-content-aiedit" class="tab-content hidden space-y-4">
+             <label for="edit-image-upload" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
+                <span data-key="uploadForEditing"></span>
+            </label>
+            <input id="edit-image-upload" type="file" class="hidden" accept="image/*" />
+            
+            <div id="edit-image-preview-container" class="image-preview-container">
+                 <div class="watermark-overlay"></div>
+                 <div id="edit-image-placeholder" class="text-center text-slate-400 p-4">
+                    <svg class="w-16 h-16 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <p class="mt-2 font-semibold" data-key="imagePreviewPlaceholder">معاينة الصورة</p>
+                 </div>
+                 <img id="edit-image-preview" src="#" alt="Image preview for editing" class="preview-image hidden">
+                 <button id="cancel-preview-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                 </button>
+                 <div class="absolute top-0 left-0 w-full h-full z-10"></div>
+            </div>
+
+            <textarea id="edit-prompt" data-key-placeholder="editPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-600" placeholder="مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة..." disabled></textarea>
+            <button id="generate-btn-aiedit" data-key="editBtn" class="generate-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>تطبيق التعديلات</button>
+        </div>
+        
+        <div id="tab-content-translate" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <span id="error-title" class="font-bold" data-key="errorTitleDefault"></span> 
-                    <span id="error-text"></span>
+                    <label for="source-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="sourceLangLabel">من لغة</label>
+                    <select id="source-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Arabic">العربية</option>
+                        <option value="English">English</option>
+                        <option value="Hebrew">עברית</option>
+                        <option value="Aramaic">Aramaic</option>
+                        <option value="Syriac">Syriac</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="target-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="targetLangLabel">إلى لغة</label>
+                    <select id="target-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="English" selected>English</option>
+                        <option value="Arabic">العربية</option>
+                        <option value="Hebrew">עברית</option>
+                        <option value="Aramaic">Aramaic</option>
+                        <option value="Syriac">Syriac</option>
+                    </select>
                 </div>
             </div>
-
-            <!-- Tabs -->
-            <div class="border-b border-slate-700">
-                <nav class="-mb-px flex space-x-4 rtl:space-x-reverse overflow-x-auto pb-px" aria-label="Tabs">
-                    <button id="tab-text" data-key="tabText" class="tab-btn tab-active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">نص إلى صورة</button>
-                    <button id="tab-legal" data-key="tabLegal" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">الباحث القانوني</button>
-                    <button id="tab-aiedit" data-key="tabAiEdit" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">تعديل الصور</button>
-                    <button id="tab-translate" data-key="tabTranslate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">ترجمة النصوص</button>
-                    <button id="tab-merge" data-key="tabMerge" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500">دمج الصور</button>
-                </nav>
-            </div>
-
-            <!-- Tab Content -->
-            <div id="tab-content-text" class="tab-content">
-                <textarea id="text-prompt" data-key-placeholder="textPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: رائد فضاء يركب حصانًا على المريخ، بأسلوب سينمائي..."></textarea>
-                <button id="generate-btn-text" data-key="generateBtn" class="generate-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">إنشاء صورة</button>
-            </div>
-
-            <div id="tab-content-legal" class="tab-content hidden space-y-4">
-                <input type="text" id="legal-query" data-key-placeholder="legalQueryPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: قانون التجارة في دولة الكويت...">
-                <button id="generate-btn-legal" data-key="searchBtn" class="generate-btn w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">بحث</button>
-            </div>
-
-            <div id="tab-content-aiedit" class="tab-content hidden space-y-4">
-                 <label for="edit-image-upload" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                    <span data-key="uploadForEditing"></span>
-                </label>
-                <input id="edit-image-upload" type="file" class="hidden" accept="image/*" />
-                
-                <div id="edit-image-preview-container" class="image-preview-container">
-                     <div class="watermark-overlay"></div>
-                     <div id="edit-image-placeholder" class="text-center text-slate-400 p-4">
-                        <svg class="w-16 h-16 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <p class="mt-2 font-semibold" data-key="imagePreviewPlaceholder">معاينة الصورة</p>
-                     </div>
-                     <img id="edit-image-preview" src="#" alt="Image preview for editing" class="preview-image hidden">
-                     <button id="cancel-preview-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                     </button>
-                     <div class="absolute top-0 left-0 w-full h-full z-10"></div>
-                </div>
-
-                <textarea id="edit-prompt" data-key-placeholder="editPlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-600" placeholder="مثال: تغيير لون الشعر إلى أشقر، إضافة قبعة..." disabled></textarea>
-                <button id="generate-btn-aiedit" data-key="editBtn" class="generate-btn w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>تطبيق التعديلات</button>
-            </div>
-            
-            <div id="tab-content-translate" class="tab-content hidden space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="source-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="sourceLangLabel">من لغة</label>
-                        <select id="source-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Arabic">العربية</option>
-                            <option value="English">English</option>
-                            <option value="Hebrew">עברית</option>
-                            <option value="Aramaic">Aramaic</option>
-                            <option value="Syriac">Syriac</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="target-lang" class="block text-sm font-medium text-gray-400 mb-2" data-key="targetLangLabel">إلى لغة</label>
-                        <select id="target-lang" class="w-full bg-slate-700 text-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="English" selected>English</option>
-                            <option value="Arabic">العربية</option>
-                            <option value="Hebrew">עברית</option>
-                            <option value="Aramaic">Aramaic</option>
-                            <option value="Syriac">Syriac</option>
-                        </select>
+            <textarea id="translate-input" data-key-placeholder="translatePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="اكتب النص الذي تريد ترجمته هنا..."></textarea>
+            <button id="generate-btn-translate" data-key="translateBtn" class="generate-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">ترجمة</button>
+        </div>
+        
+        <div id="tab-content-merge" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Image 1 Upload -->
+                <div class="space-y-2">
+                    <label for="merge-image-upload-1" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
+                        <span data-key="uploadForMerge1"></span>
+                    </label>
+                    <input id="merge-image-upload-1" type="file" class="hidden" accept="image/*" />
+                    <div id="merge-image-preview-container-1" class="image-preview-container">
+                         <div class="watermark-overlay"></div>
+                         <div id="merge-image-placeholder-1" class="text-center text-slate-400 p-4">
+                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                         </div>
+                         <img id="merge-image-preview-1" src="#" alt="Image 1 for merging" class="preview-image hidden">
+                         <button id="cancel-preview-btn-merge-1" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                         </button>
                     </div>
                 </div>
-                <textarea id="translate-input" data-key-placeholder="translatePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="اكتب النص الذي تريد ترجمته هنا..."></textarea>
-                <button id="generate-btn-translate" data-key="translateBtn" class="generate-btn w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">ترجمة</button>
-            </div>
-            
-            <div id="tab-content-merge" class="tab-content hidden space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Image 1 Upload -->
-                    <div class="space-y-2">
-                        <label for="merge-image-upload-1" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                            <span data-key="uploadForMerge1"></span>
-                        </label>
-                        <input id="merge-image-upload-1" type="file" class="hidden" accept="image/*" />
-                        <div id="merge-image-preview-container-1" class="image-preview-container">
-                             <div class="watermark-overlay"></div>
-                             <div id="merge-image-placeholder-1" class="text-center text-slate-400 p-4">
-                                <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                             </div>
-                             <img id="merge-image-preview-1" src="#" alt="Image 1 for merging" class="preview-image hidden">
-                             <button id="cancel-preview-btn-merge-1" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                             </button>
-                        </div>
+                 <!-- Image 2 Upload -->
+                <div class="space-y-2">
+                    <label for="merge-image-upload-2" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
+                        <span data-key="uploadForMerge2"></span>
+                    </label>
+                    <input id="merge-image-upload-2" type="file" class="hidden" accept="image/*" />
+                     <div id="merge-image-preview-container-2" class="image-preview-container">
+                         <div class="watermark-overlay"></div>
+                         <div id="merge-image-placeholder-2" class="text-center text-slate-400 p-4">
+                            <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                         </div>
+                         <img id="merge-image-preview-2" src="#" alt="Image 2 for merging" class="preview-image hidden">
+                         <button id="cancel-preview-btn-merge-2" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                         </button>
                     </div>
-                     <!-- Image 2 Upload -->
-                    <div class="space-y-2">
-                        <label for="merge-image-upload-2" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center cursor-pointer block">
-                            <span data-key="uploadForMerge2"></span>
-                        </label>
-                        <input id="merge-image-upload-2" type="file" class="hidden" accept="image/*" />
-                         <div id="merge-image-preview-container-2" class="image-preview-container">
-                             <div class="watermark-overlay"></div>
-                             <div id="merge-image-placeholder-2" class="text-center text-slate-400 p-4">
-                                <svg class="w-12 h-12 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                             </div>
-                             <img id="merge-image-preview-2" src="#" alt="Image 2 for merging" class="preview-image hidden">
-                             <button id="cancel-preview-btn-merge-2" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 hidden cursor-pointer">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                             </button>
-                        </div>
-                    </div>
-                </div>
-                <textarea id="merge-prompt" data-key-placeholder="mergePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="وصف اختياري: ادمج الصورتين مع التركيز على..."></textarea>
-                <button id="generate-btn-merge" data-key="mergeBtn" class="generate-btn w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>دمج الصورتين</button>
-            </div>
-
-
-            <!-- Result Section -->
-            <div id="result-section" class="bg-slate-900 rounded-lg p-4 min-h-[300px] flex flex-col items-center justify-center space-y-4 hidden">
-                <!-- Loader -->
-                <div id="loader" class="text-center">
-                    <div class="pulsing-loader mx-auto"></div>
-                    <p data-key="loaderText" class="mt-4 text-gray-400"></p>
-                </div>
-                <!-- Image Result -->
-                <div id="image-result-container" class="w-full max-w-lg hidden relative">
-                    <button id="cancel-generation-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 cursor-pointer">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                    <div class="watermark-overlay"></div>
-                    <img id="generated-image" class="w-full rounded-lg" alt="">
-                    <div class="absolute top-0 left-0 w-full h-full z-10"></div>
-                </div>
-                <!-- Text/Legal Result -->
-                <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
-                    <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer">
-                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                    <button id="download-text-btn" data-key-title="downloadText" class="absolute top-2 right-12 rtl:right-auto rtl:left-12 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer hidden">
-                       <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    </button>
-                    <div id="article-content" class="result-text-container"></div>
-                    <div id="sources-container" class="mt-4 pt-4 border-t border-slate-700 hidden">
-                        <h4 class="font-bold mb-2" data-key="legalSourcesTitle"></h4>
-                        <ul id="sources-list" class="list-disc list-inside text-sm space-y-1 text-left"></ul>
-                    </div>
-                </div>
-                <!-- Payment & Download Section -->
-                <div id="payment-section" class="text-center hidden w-full max-w-md space-y-3">
-                     <div id="payment-message" class="hidden p-3 text-sm text-green-400 bg-green-800/50 rounded-lg" role="alert">
-                        <span data-key="paymentSuccess" class="font-medium"></span>
-                    </div>
-                    <p id="payment-instruction" data-key="paymentInstructionText" class="text-sm text-gray-300"></p>
-                    <div id="paypal-button-container"></div>
-                    <a id="download-btn" href="#" download="ai_generated_content.zip" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center inline-block opacity-50 cursor-not-allowed">
-                        <span></span>
-                    </a>
                 </div>
             </div>
+            <textarea id="merge-prompt" data-key-placeholder="mergePlaceholder" class="w-full bg-slate-700 text-gray-200 rounded-lg p-4 h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="وصف اختياري: ادمج الصورتين مع التركيز على..."></textarea>
+            <button id="generate-btn-merge" data-key="mergeBtn" class="generate-btn w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:bg-slate-600 disabled:cursor-not-allowed" disabled>دمج الصورتين</button>
         </div>
 
-        <footer class="text-center py-4">
-            <p data-key="copyright" class="text-xs text-slate-500"></p>
-            <div class="mt-2">
-                <a href="https://www.instagram.com/boood0003" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">
-                    https://www.instagram.com/boood0003
+
+        <!-- Result Section -->
+        <div id="result-section" class="bg-slate-900 rounded-lg p-4 min-h-[300px] flex flex-col items-center justify-center space-y-4 hidden">
+            <!-- Loader -->
+            <div id="loader" class="text-center">
+                <div class="pulsing-loader mx-auto"></div>
+                <p data-key="loaderText" class="mt-4 text-gray-400"></p>
+            </div>
+            <!-- Image Result -->
+            <div id="image-result-container" class="w-full max-w-lg hidden relative">
+                <button id="cancel-generation-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-800/50 hover:bg-slate-700/70 rounded-full p-1 cursor-pointer">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="watermark-overlay"></div>
+                <img id="generated-image" class="w-full rounded-lg" alt="">
+                <div class="absolute top-0 left-0 w-full h-full z-10"></div>
+            </div>
+            <!-- Text/Legal Result -->
+            <div id="text-result-container" class="w-full max-w-3xl bg-slate-800 p-4 rounded-lg h-96 overflow-y-auto hidden relative">
+                <button id="cancel-article-btn" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer">
+                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <button id="download-text-btn" data-key-title="downloadText" class="absolute top-2 right-12 rtl:right-auto rtl:left-12 z-20 bg-slate-900/50 hover:bg-slate-700/70 rounded-full p-2 cursor-pointer hidden">
+                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+                <div id="article-content" class="result-text-container"></div>
+                <div id="sources-container" class="mt-4 pt-4 border-t border-slate-700 hidden">
+                    <h4 class="font-bold mb-2" data-key="legalSourcesTitle"></h4>
+                    <ul id="sources-list" class="list-disc list-inside text-sm space-y-1 text-left"></ul>
+                </div>
+            </div>
+            <!-- Payment & Download Section -->
+            <div id="payment-section" class="text-center hidden w-full max-w-md space-y-3">
+                 <div id="payment-message" class="hidden p-3 text-sm text-green-400 bg-green-800/50 rounded-lg" role="alert">
+                    <span data-key="paymentSuccess" class="font-medium"></span>
+                </div>
+                <p id="payment-instruction" data-key="paymentInstructionText" class="text-sm text-gray-300"></p>
+                <div id="paypal-button-container"></div>
+                <a id="download-btn" href="#" download="ai_generated_content.zip" class="hidden w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 text-center inline-block opacity-50 cursor-not-allowed">
+                    <span></span>
                 </a>
             </div>
-        </footer>
+        </div>
     </div>
+
+    <footer class="text-center py-4">
+        <p data-key="copyright" class="text-xs text-slate-500"></p>
+        <div class="mt-2">
+            <a href="https://www.instagram.com/boood0003" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">
+                https://www.instagram.com/boood0003
+            </a>
+        </div>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -360,11 +343,6 @@
             // --- I18N (Internationalization) ---
             const translations = {
                 en: {
-                    subscriptionTitle: 'Exclusive Access',
-                    subscriptionMessage: 'This content is for subscribers only. Please enter your access code.',
-                    subscriptionPlaceholder: 'Enter Access Code',
-                    unlockBtnText: 'Unlock',
-                    wrongCodeError: 'Incorrect code. Please try again.',
                     tabText: 'Text to Image',
                     tabLegal: 'Legal AI Researcher',
                     tabAiEdit: 'AI Image Editing',
@@ -412,11 +390,6 @@
                     legalSourcesTitle: 'Sources:',
                 },
                 ar: {
-                    subscriptionTitle: 'وصول حصري',
-                    subscriptionMessage: 'هذا المحتوى متاح للمشتركين فقط. الرجاء إدخال رمز الوصول الخاص بك.',
-                    subscriptionPlaceholder: 'ادخل رمز الوصول',
-                    unlockBtnText: 'فتح',
-                    wrongCodeError: 'الرمز غير صحيح. الرجاء المحاولة مرة أخرى.',
                     tabText: 'نص إلى صورة',
                     tabLegal: 'الباحث القانوني',
                     tabAiEdit: 'تعديل الصور',
@@ -502,8 +475,6 @@
                 });
                 
                 document.getElementById('generated-image').alt = translation.generatedImageAlt;
-                document.getElementById('subscription-error').textContent = '';
-
 
                 langBtnEn.classList.toggle('lang-active', lang === 'en');
                 langBtnAr.classList.toggle('lang-active', lang === 'ar');
@@ -517,12 +488,6 @@
             langBtnAr.addEventListener('click', () => setLanguage('ar'));
             
             // --- Element Selection ---
-            const subscriptionLock = document.getElementById('subscription-lock');
-            const pageContentWrapper = document.getElementById('page-content-wrapper');
-            const subscriptionCode = document.getElementById('subscription-code');
-            const unlockBtn = document.getElementById('unlock-btn');
-            const subscriptionError = document.getElementById('subscription-error');
-            
             const mainContentWrapper = document.getElementById('main-content-wrapper');
             const tabs = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -574,27 +539,6 @@
 
             const cancelGenerationBtn = document.getElementById('cancel-generation-btn');
             const cancelArticleBtn = document.getElementById('cancel-article-btn');
-
-            // --- Subscription Lock Logic ---
-            const correctCode = "66774364%"; // You can change this code
-            
-            const attemptUnlock = () => {
-                const enteredCode = subscriptionCode.value.trim();
-                if (enteredCode === correctCode) {
-                    subscriptionLock.style.display = 'none';
-                    pageContentWrapper.style.display = 'block';
-                } else {
-                    subscriptionError.textContent = translations[currentLang].wrongCodeError;
-                    subscriptionCode.value = '';
-                }
-            };
-            
-            unlockBtn.addEventListener('click', attemptUnlock);
-            subscriptionCode.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    attemptUnlock();
-                }
-            });
             
             if(mainContentWrapper) {
                 mainContentWrapper.classList.add('no-screenshot');
@@ -1071,5 +1015,4 @@
 
 </body>
 </html>
-
 
